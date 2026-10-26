@@ -133,6 +133,20 @@ defmodule Kunai.Sender do
       else: :ok
   end
 
+  @doc false
+  # The headers of a request, signed: what is sent, and what
+  # `mix kunai.trigger --dry-run` prints.
+  def headers(endpoint, webhook_id, timestamp, body) do
+    [
+      {"content-type", "application/json"},
+      {"user-agent", "Kunai (+https://hex.pm/packages/kunai)"},
+      {"webhook-id", webhook_id},
+      {"webhook-timestamp", Integer.to_string(timestamp)},
+      {"webhook-signature",
+       Signature.header(Endpoints.keys(endpoint), webhook_id, timestamp, body)}
+    ]
+  end
+
   defp earlier_pending?(delivery) do
     Delivery
     |> where([d], d.endpoint_id == ^delivery.endpoint_id and d.status == "pending")
@@ -169,15 +183,7 @@ defmodule Kunai.Sender do
   defp request(delivery, endpoint, body, number) do
     timestamp = System.system_time(:second)
     {transport, opts} = Config.transport()
-
-    headers = [
-      {"content-type", "application/json"},
-      {"user-agent", "Kunai (+https://hex.pm/packages/kunai)"},
-      {"webhook-id", delivery.id},
-      {"webhook-timestamp", Integer.to_string(timestamp)},
-      {"webhook-signature",
-       Signature.header(Endpoints.keys(endpoint), delivery.id, timestamp, body)}
-    ]
+    headers = headers(endpoint, delivery.id, timestamp, body)
 
     started = System.monotonic_time(:millisecond)
     response = transport.request(endpoint.url, headers, body, opts)

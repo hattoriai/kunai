@@ -192,6 +192,21 @@ every write, `expand[]`, and one error format. Its OpenAPI document,
 JSON Schema, so a client generates its receiver as well as its calls
 (`Kunai.API`).
 
+## Trying them
+
+Webhooks are hard to try by hand; the [Testing guide](guides/testing.md)
+has a shortcut for each part:
+
+* **An inbox in your app**, in development (`plug Kunai.Dev.Inbox`):
+  endpoints at `localhost:4000/dev/webhooks/inbox/<name>`, each request
+  shown live with whether its signature verifies, `?status=503` to watch
+  the retries.
+* **`mix kunai.trigger page.updated`**: an event of your catalog, sent
+  now, each delivery shown as it goes; `--dry-run` prints the signed
+  request and a `curl`.
+* **`Kunai.Testing`** in your tests: `assert_emitted`, `deliver`,
+  `assert_delivered` (with the signature verified), `respond`.
+
 ## Delivery
 
 | Answer | What follows |

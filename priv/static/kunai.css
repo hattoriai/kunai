@@ -1437,6 +1437,26 @@
   transform: rotate(180deg);
 }
 
+/* The inbox's address, and its button. */
+.kunai-inbox-url {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--kunai-radius-field);
+  background: var(--kunai-surface);
+}
+
+.kunai-inbox-url .kunai-inline-copy {
+  flex: 1;
+}
+
+.kunai-inbox-url + .kunai-hint {
+  margin-top: 0.625rem;
+}
+
 .kunai-form-actions {
   display: flex;
   justify-content: flex-end;

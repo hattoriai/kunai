@@ -4,6 +4,8 @@ defmodule Kunai.Live.EndpointsLive do
 
   use Kunai.Live.Page
 
+  alias Kunai.Dev.Inbox
+
   @impl true
   def mount(_params, _session, socket) do
     scope = socket.assigns.kunai_scope
@@ -16,7 +18,9 @@ defmodule Kunai.Live.EndpointsLive do
        more?: page.has_more,
        summary: Kunai.Stats.summary(scope),
        stats: Kunai.Stats.by_endpoint(scope),
-       example: Kunai.example_payload()
+       example: Kunai.example_payload(),
+       # In development, with the inbox's plug in the app's endpoint.
+       inbox?: Inbox.running?()
      )}
   end
 
@@ -27,6 +31,7 @@ defmodule Kunai.Live.EndpointsLive do
       <.header eyebrow={@kunai.eyebrow} title={t("Webhooks")}>
         <:subtitle>{t("Send this account's events to your own systems, signed, as they happen.")}</:subtitle>
         <:actions>
+          <.button :if={@inbox?} icon="inbox" navigate={"#{@kunai.base}/inbox"}>{t("Inbox")}</.button>
           <.button :if={@endpoints != []} variant="primary" icon="plus" navigate={new_endpoint_path(@kunai.base)}>
             {t("Add endpoint")}
           </.button>

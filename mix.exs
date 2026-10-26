@@ -87,7 +87,7 @@ defmodule Kunai.MixProject do
       source_ref: "v#{@version}",
       source_url: @source_url,
       assets: %{"media" => "media"},
-      extras: ["README.md", "guides/customizing.md", "CHANGELOG.md"]
+      extras: ["README.md", "guides/customizing.md", "guides/testing.md", "CHANGELOG.md"]
     ]
   end
 end

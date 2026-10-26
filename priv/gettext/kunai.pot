@@ -82,6 +82,14 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Add ?status=503 to the address to answer with that status and watch the retries, or ?delay=2000 to answer late."
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Add an endpoint here"
+msgstr ""
+
 #: lib/kunai/components.ex
 #: lib/kunai/live/endpoint_form_live.ex
 #: lib/kunai/live/endpoints_live.ex
@@ -105,8 +113,20 @@ msgstr ""
 msgid "All healthy"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Allow it in development: config :kunai, egress: [allow_http: true, allow_private: true]"
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "An endpoint at an inbox's address receives into it. Any name makes an inbox."
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "An event reaches the endpoint only when it has the event's access."
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Answered"
 msgstr ""
 
 #: lib/kunai/live/endpoint_live.ex
@@ -125,6 +145,10 @@ msgstr ""
 msgid "Average"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Body"
+msgstr ""
+
 #: lib/kunai/components.ex
 #: lib/kunai/live/delivery_live.ex
 msgid "Breadcrumb"
@@ -138,7 +162,12 @@ msgstr ""
 msgid "Choose where to send events, and which."
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Clear"
+msgstr ""
+
 #: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/inbox_live.ex
 msgid "Close"
 msgstr ""
 
@@ -203,6 +232,10 @@ msgstr ""
 msgid "Disabled: the endpoint answered 410 Gone"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Does not verify"
+msgstr ""
+
 #: lib/kunai/live/endpoint_live.ex
 msgid "Edit"
 msgstr ""
@@ -221,6 +254,7 @@ msgstr ""
 
 #: lib/kunai/components.ex
 #: lib/kunai/live/endpoint_form_live.ex
+#: lib/kunai/live/inbox_live.ex
 msgid "Endpoint"
 msgstr ""
 
@@ -254,6 +288,7 @@ msgstr ""
 
 #: lib/kunai/components.ex
 #: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/inbox_live.ex
 msgid "Event"
 msgstr ""
 
@@ -318,12 +353,21 @@ msgstr ""
 msgid "HTTPS, on an address the internet can reach."
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Headers"
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "Hidden"
 msgstr ""
 
 #: lib/kunai/live/endpoint_live.ex
 msgid "Hide"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+#: lib/kunai/live/inbox_live.ex
+msgid "Inbox"
 msgstr ""
 
 #: lib/kunai/live/endpoint_live.ex
@@ -336,6 +380,10 @@ msgstr ""
 
 #: lib/kunai/components.ex
 msgid "Its id only: the receiver asks the API for the rest."
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Kunai cannot send to this app yet"
 msgstr ""
 
 #: lib/kunai/components.ex
@@ -376,6 +424,14 @@ msgstr ""
 msgid "No delivery has this status."
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "No endpoint"
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "No endpoint has this address."
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "No event matches."
 msgstr ""
@@ -392,8 +448,16 @@ msgstr ""
 msgid "None here"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Not an event"
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "Not tried yet."
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Nothing yet"
 msgstr ""
 
 #: lib/kunai/components.ex
@@ -437,7 +501,12 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Received"
+msgstr ""
+
 #: lib/kunai/components.ex
+#: lib/kunai/live/inbox_live.ex
 msgid "Request"
 msgstr ""
 
@@ -482,6 +551,10 @@ msgstr ""
 msgid "Send a test event"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Send a test event to an endpoint at the inbox, or make a change the app tells of."
+msgstr ""
+
 #: lib/kunai/live/endpoint_live.ex
 msgid "Send a test event, or wait for the next event."
 msgstr ""
@@ -503,6 +576,10 @@ msgstr ""
 msgid "Send this account's events to your own systems, signed, as they happen."
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "Send to the inbox"
+msgstr ""
+
 #: lib/kunai/live/delivery_live.ex
 #: lib/kunai/live/endpoint_live.ex
 msgid "Sending…"
@@ -511,6 +588,10 @@ msgstr ""
 #: lib/kunai/live/delivery_live.ex
 #: lib/kunai/live/endpoint_live.ex
 msgid "Sent again, with the same webhook-id."
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Signature"
 msgstr ""
 
 #: lib/kunai/components.ex
@@ -567,6 +648,10 @@ msgstr ""
 msgid "The version of the payloads it receives."
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "The webhooks this app sends to itself, in development, as they arrive."
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "The whole object, as it was when it changed."
 msgstr ""
@@ -583,8 +668,16 @@ msgstr ""
 msgid "To"
 msgstr ""
 
+#: lib/kunai/live/inbox_live.ex
+msgid "To the inbox"
+msgstr ""
+
 #: lib/kunai/components.ex
 msgid "URL"
+msgstr ""
+
+#: lib/kunai/live/inbox_live.ex
+msgid "Verified"
 msgstr ""
 
 #: lib/kunai/live/endpoint_live.ex
@@ -603,6 +696,7 @@ msgstr ""
 #: lib/kunai/components.ex
 #: lib/kunai/live/endpoint_form_live.ex
 #: lib/kunai/live/endpoints_live.ex
+#: lib/kunai/live/inbox_live.ex
 msgid "Webhooks"
 msgstr ""
 

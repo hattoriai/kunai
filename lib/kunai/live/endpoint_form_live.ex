@@ -35,8 +35,13 @@ defmodule Kunai.Live.EndpointFormLive do
     end
   end
 
-  defp endpoint(:new, _params, _scope),
-    do: %Endpoint{events: ["*"], api_version: Kunai.catalog().latest_version()}
+  # A new one, its URL given by a link (the inbox's) when it has one.
+  defp endpoint(:new, params, _scope),
+    do: %Endpoint{
+      events: ["*"],
+      api_version: Kunai.catalog().latest_version(),
+      url: params["url"]
+    }
 
   defp endpoint(:edit, %{"id" => id}, scope), do: Kunai.get_endpoint(scope, id)
 

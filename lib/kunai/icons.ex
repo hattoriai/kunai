@@ -38,7 +38,9 @@ defmodule Kunai.Icons do
     "clock" => ~s(<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>),
     "hook" =>
       ~s(<path d="M15.5 3.5L9 10M15.5 3.5l3 .5.5 3M9 10a2.5 2.5 0 1 0 0 3.5M7.2 12.6L6 19a2.5 2.5 0 0 0 5 .6V18"/>),
-    "code" => ~s(<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>)
+    "code" => ~s(<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>),
+    "inbox" =>
+      ~s(<path d="M4 13l2.4-7.2A1.5 1.5 0 0 1 7.8 4.8h8.4a1.5 1.5 0 0 1 1.4 1L20 13v5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18v-5z"/><path d="M4 13h4.5l1 2h5l1-2H20"/>)
   }
 
   @doc "The names of the icons."

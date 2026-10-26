@@ -69,6 +69,7 @@ defmodule Kunai.Router do
   routes do
     live "/", Kunai.Live.EndpointsLive, :index
     live "/new", Kunai.Live.EndpointFormLive, :new
+    live "/inbox", Kunai.Live.InboxLive, :index
     live "/endpoints/:id", Kunai.Live.EndpointLive, :show
     live "/endpoints/:id/edit", Kunai.Live.EndpointFormLive, :edit
     live "/deliveries/:id", Kunai.Live.DeliveryLive, :show

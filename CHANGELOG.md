@@ -24,6 +24,15 @@ The core, a REST API and pages, mounted with PhoenixMountable.
   what the pages call, for pages of an app's own.
 * The Customizing guide: the tokens, the mappings, the frame, the words,
   a page of the app's own.
+* `Kunai.Dev.Inbox`: endpoints that are the app itself, in development,
+  each request shown live on the Inbox page, its signature verified, its
+  answer chosen by its address (`?status=`, `?delay=`).
+* `mix kunai.trigger`: an event of the catalog, from its example, sent
+  now and watched; `--dry-run` prints the signed requests and a `curl`.
+* `Kunai.Testing`: `assert_emitted`, `refute_emitted`, `deliver`,
+  `respond`, `assert_delivered` and `refute_delivered`, with
+  `Kunai.Testing.Transport`.
+* The Testing guide.
 * `kunai_api/2`: the REST API, with prefixed ids, cursor lists,
   `Idempotency-Key`, `expand[]`, one error format, and an OpenAPI document
   with the webhooks themselves.

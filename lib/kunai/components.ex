@@ -757,9 +757,10 @@ defmodule Kunai.Components do
     """
   end
 
+  @doc "An HTTP status, green when it is a success."
   attr(:code, :integer, required: true)
 
-  defp code_pill(assigns) do
+  def code_pill(assigns) do
     ~H"""
     <span class={["kunai-code-pill", if(@code in 200..299, do: "kunai-code-pill--ok", else: "kunai-code-pill--fail")]}>
       {@code}
