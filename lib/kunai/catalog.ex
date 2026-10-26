@@ -79,6 +79,13 @@ defmodule Kunai.Catalog do
   @doc "The object of an event as it is kept, without what must not be. The object as it is by default."
   @callback redact(type :: String.t(), object :: map()) :: map()
 
+  @doc """
+  The scopes a person may give an endpoint: those they hold themselves, so
+  an endpoint never sees more than its maker may. Every scope of the
+  catalog by default.
+  """
+  @callback scopes(scope :: term()) :: [String.t()]
+
   @ping %Kunai.EventType{
     name: "kunai.ping",
     doc: "A test, sent to one endpoint on request."
@@ -101,7 +108,10 @@ defmodule Kunai.Catalog do
       @impl Kunai.Catalog
       def redact(_type, object), do: object
 
-      defoverridable owner: 1, actor: 1, redact: 2
+      @impl Kunai.Catalog
+      def scopes(_scope), do: all_scopes()
+
+      defoverridable owner: 1, actor: 1, redact: 2, scopes: 1
     end
   end
 
@@ -142,6 +152,11 @@ defmodule Kunai.Catalog do
       @doc "The events of the catalog."
       @spec event_types() :: [Kunai.EventType.t()]
       def event_types, do: __kunai__(:events) |> Map.values() |> Enum.sort_by(& &1.name)
+
+      @doc "Every scope the catalog's events declare."
+      @spec all_scopes() :: [String.t()]
+      def all_scopes,
+        do: event_types() |> Enum.flat_map(& &1.scopes) |> Enum.uniq() |> Enum.sort()
 
       @doc "The versions of the payloads, oldest first."
       @spec versions() :: [String.t()]

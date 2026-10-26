@@ -101,6 +101,51 @@ or of one it is pinned to, downgraded for it (`Kunai.Versions`).
 Every change is in the audit log with who made it, and `Kunai.Page`
 lists everything newest first, with Stripe's cursors.
 
+## Pages and an API, in your router
+
+Kunai mounts in your app with
+[PhoenixMountable](https://hexdocs.pm/phoenix_mountable), as a Rails
+engine would: ordinary routes behind your own pipelines.
+
+```elixir
+import Kunai.Router
+
+scope "/settings" do
+  pipe_through [:browser, :require_authenticated_user]
+
+  kunai "/webhooks",
+    on_mount: [{MyAppWeb.UserAuth, :require_authenticated}],
+    app_layout: {MyAppWeb.Layouts, :app}
+end
+
+scope "/api/v1" do
+  pipe_through [:api, :fetch_api_scope]
+  kunai_api "/webhooks"
+end
+```
+
+Both read the request's scope where your pipeline and hooks put it
+(`:current_scope`), so a person sees their owner's endpoints only.
+
+**The pages** (`kunai`) are your users' webhook settings: their
+endpoints, the form of one (its events, its access, full or thin
+payloads, order, version, signing), its secret to reveal and roll, a test
+to send, its deliveries live over PubSub, and each delivery with its
+attempts and its payload, to send again. They render in your layout,
+styled by a style sheet you import, every colour a `--kunai-*` property:
+
+```css
+@import "../../deps/kunai/priv/static/kunai.css";
+/* @import "../../deps/kunai/priv/static/kunai-sumi.css"; */
+```
+
+**The API** (`kunai_api`) has Stripe's conventions: prefixed ids,
+cursor lists (`starting_after`, `ending_before`), `Idempotency-Key` on
+every write, `expand[]`, and one error format. Its OpenAPI document,
+`GET /webhooks/openapi.json`, has each event under `webhooks`, with its
+JSON Schema, so a client generates its receiver as well as its calls
+(`Kunai.API`).
+
 ## Delivery
 
 | Answer | What follows |
@@ -170,11 +215,8 @@ Kunai needs Oban's open source engines, not Oban Pro, and emits
 
 ## Roadmap
 
-* **A REST API in one line of your router**: endpoints, events,
-  deliveries and the catalog, with Stripe's conventions (prefixed ids,
-  cursors, `Idempotency-Key`, one error format) and an OpenAPI document.
-* **Pages for your users**: their endpoints, a form, a delivery log live
-  over PubSub, an event with its attempts and a button to send it again.
+* **An admin's page** across every owner: the endpoints failing, the
+  deliveries waiting, in a document of its own, as Oban Web's.
 * **`mix kunai.listen`**: your events, live, to localhost in development,
   over a Phoenix channel, with no tunnel.
 * **An installer** (`mix igniter.install kunai`), an endpoint verified by

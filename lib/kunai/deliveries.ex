@@ -129,8 +129,12 @@ defmodule Kunai.Deliveries do
         )
         |> Config.repo().transaction()
         |> case do
-          {:ok, %{delivery: delivery}} -> {:ok, delivery}
-          {:error, _step, reason, _changes} -> {:error, reason}
+          {:ok, %{delivery: delivery}} ->
+            Kunai.Broadcast.endpoint(endpoint.id, {:kunai_delivery, delivery.event_id})
+            {:ok, delivery}
+
+          {:error, _step, reason, _changes} ->
+            {:error, reason}
         end
     end
   end

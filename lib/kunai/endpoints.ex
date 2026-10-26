@@ -18,12 +18,15 @@ defmodule Kunai.Endpoints do
   Attributes: `:url`, `:events`, `:description`, `:scopes`, `:payload`,
   `:ordered`, `:api_version`, `:metadata` (`Kunai.Endpoint`). Options:
   `:signing`, `:hmac` (the default) or `:ed25519`.
+
+  An endpoint's scopes are among those its maker may give
+  (`c:Kunai.Catalog.scopes/1`): all of them when it names none.
   """
   @spec create(term(), map(), keyword()) ::
           {:ok, Endpoint.t(), String.t()} | {:error, Ecto.Changeset.t()}
   def create(scope, attrs, opts \\ []) do
     owner = Owner.of(scope)
-    changeset = Endpoint.create_changeset(attrs, owner)
+    changeset = attrs |> Endpoint.create_changeset(owner) |> grant(scope, given_scopes?(attrs))
     signing = Keyword.get(opts, :signing, :hmac)
 
     Multi.new()
@@ -62,7 +65,7 @@ defmodule Kunai.Endpoints do
   @doc "Changes an endpoint (the attributes of `create/3`)."
   @spec update(term(), Endpoint.t(), map()) :: {:ok, Endpoint.t()} | {:error, Ecto.Changeset.t()}
   def update(scope, %Endpoint{} = endpoint, attrs) do
-    changeset = Endpoint.changeset(endpoint, attrs)
+    changeset = endpoint |> Endpoint.changeset(attrs) |> grant(scope, true)
     change(scope, changeset, "updated", changeset.changes)
   end
 
@@ -117,6 +120,20 @@ defmodule Kunai.Endpoints do
       {:ok, %{endpoint: endpoint}} -> {:ok, endpoint}
       {:error, _step, changeset, _changes} -> {:error, changeset}
     end
+  end
+
+  defp given_scopes?(attrs), do: Map.has_key?(attrs, :scopes) or Map.has_key?(attrs, "scopes")
+
+  # The app's own code (a scope that is an owner, or nil) gives any scope.
+  defp grant(changeset, scope, _given?) when is_binary(scope) or is_nil(scope), do: changeset
+
+  defp grant(changeset, scope, false),
+    do: Ecto.Changeset.put_change(changeset, :scopes, Config.catalog().scopes(scope))
+
+  defp grant(changeset, scope, true) do
+    Ecto.Changeset.validate_subset(changeset, :scopes, Config.catalog().scopes(scope),
+      message: "has scopes you may not give"
+    )
   end
 
   defp transaction(multi, owner) do

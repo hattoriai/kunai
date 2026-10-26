@@ -45,9 +45,6 @@ defmodule Kunai.Sender do
 
   require Logger
 
-  # Phoenix.PubSub is optional: it is called only with a `:pubsub`.
-  @compile {:no_warn_undefined, Phoenix.PubSub}
-
   @doc false
   # :ok when the delivery is done with (for now), or {:snooze, seconds} to
   # come back without an attempt.
@@ -272,10 +269,10 @@ defmodule Kunai.Sender do
 
   # The live delivery log: each attempt, to whoever watches the endpoint.
   defp broadcast(delivery, attempt, status) do
-    if pubsub = Config.pubsub() do
-      message = {:kunai_attempt, %{delivery_id: delivery.id, attempt: attempt, status: status}}
-      Phoenix.PubSub.broadcast(pubsub, "kunai:endpoint:" <> delivery.endpoint_id, message)
-    end
+    Kunai.Broadcast.endpoint(
+      delivery.endpoint_id,
+      {:kunai_attempt, %{delivery_id: delivery.id, attempt: attempt, status: status}}
+    )
   end
 
   # An endpoint that answered again forgets that it was failing.

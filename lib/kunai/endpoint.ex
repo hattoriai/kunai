@@ -69,7 +69,7 @@ defmodule Kunai.Endpoint do
         {:error, reason} -> [url: {Kunai.Egress.describe(reason), reason: reason}]
       end
     end)
-    |> validate_length(:events, min: 1)
+    |> validate_events_present()
     |> validate_change(:events, fn :events, patterns ->
       case Kunai.Subscriptions.unknown(patterns) do
         [] -> []
@@ -85,6 +85,13 @@ defmodule Kunai.Endpoint do
     |> validate_change(:metadata, fn :metadata, metadata ->
       if map_size(metadata) <= 50, do: [], else: [metadata: "has more than 50 keys"]
     end)
+  end
+
+  # Required whether given or not: an endpoint with no events receives none.
+  defp validate_events_present(changeset) do
+    if get_field(changeset, :events) in [nil, []],
+      do: add_error(changeset, :events, "must have at least one event"),
+      else: changeset
   end
 
   defp put_default_version(changeset) do

@@ -112,7 +112,8 @@ defmodule Kunai do
   @doc """
   Deletes the events older than `days`, with their deliveries and
   attempts, and the attempts older than that of newer deliveries. The
-  audit log is kept. Gives how many of each (`Kunai.Workers.Prune`).
+  audit log is kept. The API's idempotency keys older than a day go too.
+  Gives how many events and attempts (`Kunai.Workers.Prune`).
   """
   @spec prune(pos_integer()) :: {:ok, %{events: non_neg_integer(), attempts: non_neg_integer()}}
   def prune(days \\ Config.retention_days()) when is_integer(days) and days > 0 do
@@ -124,6 +125,13 @@ defmodule Kunai do
 
     {events, _rows} =
       Kunai.Event |> where([e], e.created_at < ^before) |> repo.delete_all(Config.repo_opts())
+
+    # The API's idempotency keys are kept a day (Kunai.API.Idempotency).
+    day_ago = DateTime.add(DateTime.utc_now(), -86_400, :second)
+
+    Kunai.IdempotencyKey
+    |> where([k], k.created_at < ^day_ago)
+    |> repo.delete_all(Config.repo_opts())
 
     {:ok, %{events: events, attempts: attempts}}
   end

@@ -62,6 +62,9 @@ defmodule Kunai.Dispatcher do
       )
       |> Config.repo().transaction()
 
+    for endpoint <- endpoints,
+        do: Kunai.Broadcast.endpoint(endpoint.id, {:kunai_delivery, event.id})
+
     count
   end
 

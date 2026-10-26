@@ -9,7 +9,7 @@ defmodule Kunai.Migrations do
       defmodule MyApp.Repo.Migrations.AddKunai do
         use Ecto.Migration
 
-        def up, do: Kunai.Migrations.up(version: 1)
+        def up, do: Kunai.Migrations.up(version: 2)
         def down, do: Kunai.Migrations.down(to: 0)
       end
 
@@ -24,13 +24,15 @@ defmodule Kunai.Migrations do
   audit log (`kunai_audit_log`). The ids are Kunai's own (`Kunai.ID`),
   strings, whatever keys the app uses.
 
+  Version 2 makes the API's idempotency keys (`kunai_idempotency_keys`).
+
   `up/1` takes `:version` and `:prefix` (the schema of the tables, in
   PostgreSQL); `down/1` takes `:to` and `:prefix`.
   """
 
   use PhoenixMountable.Migrations,
     otp_app: :kunai,
-    versions: [Kunai.Migrations.V1],
+    versions: [Kunai.Migrations.V1, Kunai.Migrations.V2],
     compatible_with: 1,
     gen_task: "kunai.gen.migration"
 end

@@ -48,6 +48,10 @@ defmodule Kunai.MixProject do
       # was sent, for the receiver's plug (PhoenixMountable.RawBody).
       {:phoenix_mountable, "~> 0.2.5"},
       {:phoenix, "~> 1.7.14 or ~> 1.8"},
+      # The pages of the endpoints, mounted in the app (Kunai.Router).
+      {:phoenix_live_view, "~> 1.1"},
+      {:phoenix_ecto, "~> 4.6"},
+      {:lazy_html, "~> 0.1", only: :test},
       # The outbox: an event's job is inserted in the transaction of the
       # change it tells of. Oban's open source engines, Basic and Lite.
       {:oban, "~> 2.19"},
@@ -70,7 +74,7 @@ defmodule Kunai.MixProject do
       name: "kunai",
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url},
-      files: ~w(lib mix.exs .formatter.exs README.md CHANGELOG.md LICENSE NOTICE)
+      files: ~w(lib priv/static mix.exs .formatter.exs README.md CHANGELOG.md LICENSE NOTICE)
     ]
   end
 

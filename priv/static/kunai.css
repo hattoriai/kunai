@@ -1,0 +1,435 @@
+/*
+ * Kunai's pages.
+ *
+ * Every colour, space, radius and font comes from a --kunai-* custom
+ * property. Set them on .kunai (or higher) to match the app, or load
+ * kunai-sumi.css to map them to the Sumi tokens. The defaults below have
+ * no specificity, so a value set on :root, on an ancestor or on .kunai
+ * itself wins. They are Masu's, Kotoba's and Koyomi's own defaults, so
+ * that a page with them all looks like one thing.
+ */
+
+:where(:root) {
+  --kunai-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --kunai-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --kunai-font-size: 0.875rem;
+  --kunai-line-height: 1.5;
+  --kunai-text: #1f1f23;
+  --kunai-muted: #6b6b76;
+  --kunai-background: #ffffff;
+  --kunai-surface: #f6f6f7;
+  --kunai-border: #d9d9de;
+  --kunai-rule: #ececef;
+  --kunai-accent: #2f5bd3;
+  --kunai-accent-text: #ffffff;
+  --kunai-ok: #1d7a46;
+  --kunai-wait: #a86207;
+  --kunai-fail: #c2362b;
+  --kunai-radius: 6px;
+  --kunai-space: 0.5rem;
+  --kunai-field-height: 2.25rem;
+  --kunai-max-width: 64rem;
+  --kunai-transition: 120ms ease-out;
+}
+
+/* Dark: under the app's own switch, a `dark` class or data-theme="dark"
+   on an ancestor. Tokens an app sets itself win. */
+:where(.dark, [data-theme="dark"]) {
+  --kunai-text: #ececef;
+  --kunai-muted: #9d9da8;
+  --kunai-background: #141417;
+  --kunai-surface: #1d1d21;
+  --kunai-border: #34343b;
+  --kunai-rule: #26262b;
+  --kunai-accent: #7d9bf0;
+  --kunai-accent-text: #0f1020;
+  --kunai-ok: #5cc28b;
+  --kunai-wait: #e0a54a;
+  --kunai-fail: #ef7b70;
+}
+
+.kunai {
+  max-width: var(--kunai-max-width);
+  margin: 0 auto;
+  font-family: var(--kunai-font);
+  font-size: var(--kunai-font-size);
+  line-height: var(--kunai-line-height);
+  color: var(--kunai-text);
+}
+
+.kunai *,
+.kunai *::before,
+.kunai *::after {
+  box-sizing: border-box;
+}
+
+.kunai p {
+  margin: 0 0 var(--kunai-space);
+}
+
+.kunai-mono {
+  font-family: var(--kunai-mono);
+  font-size: 0.95em;
+  overflow-wrap: anywhere;
+}
+
+.kunai-muted {
+  color: var(--kunai-muted);
+}
+
+.kunai-link {
+  color: var(--kunai-text);
+  text-decoration: none;
+}
+
+.kunai-link:hover {
+  color: var(--kunai-accent);
+  text-decoration: underline;
+}
+
+/* The head of a page. */
+.kunai-header {
+  margin-bottom: calc(var(--kunai-space) * 4);
+}
+
+.kunai-back {
+  display: inline-block;
+  margin-bottom: var(--kunai-space);
+  color: var(--kunai-muted);
+  text-decoration: none;
+}
+
+.kunai-back:hover {
+  color: var(--kunai-text);
+}
+
+.kunai-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--kunai-space) * 2);
+}
+
+.kunai-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.kunai-subtitle {
+  margin: calc(var(--kunai-space) / 2) 0 0;
+  color: var(--kunai-muted);
+}
+
+.kunai-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kunai-space);
+}
+
+/* Sections. */
+.kunai-section {
+  margin-top: calc(var(--kunai-space) * 5);
+}
+
+.kunai-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kunai-space);
+  margin-bottom: calc(var(--kunai-space) * 1.5);
+}
+
+.kunai-section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Buttons. */
+.kunai-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--kunai-field-height);
+  padding: 0 calc(var(--kunai-space) * 1.75);
+  border: 1px solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-background);
+  color: var(--kunai-text);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--kunai-transition), border-color var(--kunai-transition);
+}
+
+.kunai-button:hover {
+  background: var(--kunai-surface);
+}
+
+.kunai-button:focus-visible,
+.kunai-input:focus-visible {
+  outline: 2px solid var(--kunai-accent);
+  outline-offset: 1px;
+}
+
+.kunai-button--primary {
+  border-color: var(--kunai-accent);
+  background: var(--kunai-accent);
+  color: var(--kunai-accent-text);
+}
+
+.kunai-button--primary:hover {
+  background: color-mix(in oklab, var(--kunai-accent) 88%, var(--kunai-text));
+}
+
+.kunai-button--danger {
+  color: var(--kunai-fail);
+}
+
+.kunai-button--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--kunai-muted);
+}
+
+.kunai-button:disabled,
+.kunai-button.phx-submit-loading {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Statuses. */
+.kunai-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.kunai-status::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.kunai-status--ok { color: var(--kunai-ok); }
+.kunai-status--wait { color: var(--kunai-wait); }
+.kunai-status--fail { color: var(--kunai-fail); }
+.kunai-status--muted { color: var(--kunai-muted); }
+
+/* Tables. */
+.kunai-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kunai-table th {
+  padding: var(--kunai-space) calc(var(--kunai-space) * 1.5);
+  border-bottom: 1px solid var(--kunai-border);
+  color: var(--kunai-muted);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.kunai-table td {
+  padding: calc(var(--kunai-space) * 1.25) calc(var(--kunai-space) * 1.5);
+  border-bottom: 1px solid var(--kunai-rule);
+  vertical-align: top;
+}
+
+.kunai-table td p {
+  margin: 0.125rem 0 0;
+}
+
+/* The details of an endpoint or a delivery. */
+.kunai-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: calc(var(--kunai-space) * 2);
+  margin: 0;
+  padding: calc(var(--kunai-space) * 2);
+  border: 1px solid var(--kunai-rule);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-surface);
+}
+
+.kunai-details dt {
+  color: var(--kunai-muted);
+  font-size: 0.8125rem;
+}
+
+.kunai-details dd {
+  margin: 0.125rem 0 0;
+}
+
+/* Notices, flashes and the empty list. */
+.kunai-notice,
+.kunai-flash {
+  margin: 0 0 calc(var(--kunai-space) * 2);
+  padding: calc(var(--kunai-space) * 1.25) calc(var(--kunai-space) * 1.75);
+  border: 1px solid var(--kunai-rule);
+  border-left: 3px solid var(--kunai-muted);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-surface);
+}
+
+.kunai-notice--fail,
+.kunai-flash--error { border-left-color: var(--kunai-fail); }
+.kunai-notice--wait { border-left-color: var(--kunai-wait); }
+.kunai-flash--info { border-left-color: var(--kunai-ok); }
+
+.kunai-flash {
+  cursor: pointer;
+}
+
+.kunai-empty {
+  padding: calc(var(--kunai-space) * 6) calc(var(--kunai-space) * 3);
+  border: 1px dashed var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  text-align: center;
+}
+
+.kunai-empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Forms. */
+.kunai-form {
+  display: grid;
+  gap: calc(var(--kunai-space) * 3);
+  max-width: 40rem;
+}
+
+.kunai-field {
+  display: grid;
+  gap: calc(var(--kunai-space) / 2);
+}
+
+.kunai-fieldset {
+  display: grid;
+  gap: var(--kunai-space);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.kunai-label {
+  padding: 0;
+  font-weight: 600;
+}
+
+.kunai-input {
+  width: 100%;
+  height: var(--kunai-field-height);
+  padding: 0 calc(var(--kunai-space) * 1.25);
+  border: 1px solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-background);
+  color: var(--kunai-text);
+  font: inherit;
+}
+
+.kunai-field--invalid .kunai-input {
+  border-color: var(--kunai-fail);
+}
+
+.kunai-hint {
+  margin: 0;
+  color: var(--kunai-muted);
+  font-size: 0.8125rem;
+}
+
+.kunai-error {
+  margin: 0;
+  color: var(--kunai-fail);
+  font-size: 0.8125rem;
+}
+
+.kunai-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem var(--kunai-space);
+  cursor: pointer;
+}
+
+.kunai-check input {
+  margin: 0;
+  accent-color: var(--kunai-accent);
+}
+
+.kunai-check .kunai-muted {
+  flex-basis: 100%;
+  padding-left: 1.5rem;
+  font-size: 0.8125rem;
+}
+
+.kunai-family {
+  display: grid;
+  gap: calc(var(--kunai-space) / 2);
+}
+
+.kunai-checks {
+  display: grid;
+  gap: calc(var(--kunai-space) / 2);
+  padding-left: 1.5rem;
+}
+
+.kunai-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kunai-space);
+  max-width: 32rem;
+}
+
+.kunai-inline .kunai-input {
+  flex: 1;
+  width: auto;
+}
+
+/* Secrets and payloads. */
+.kunai-secret {
+  font-family: var(--kunai-mono);
+  max-width: 40rem;
+}
+
+.kunai-code {
+  margin: 0;
+  padding: calc(var(--kunai-space) * 2);
+  overflow-x: auto;
+  border: 1px solid var(--kunai-rule);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-surface);
+  font-family: var(--kunai-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.kunai-snippet {
+  display: block;
+  max-width: 24rem;
+  overflow: hidden;
+  color: var(--kunai-muted);
+  font-family: var(--kunai-mono);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .kunai-table th:nth-child(n + 4),
+  .kunai-table td:nth-child(n + 4) {
+    display: none;
+  }
+}

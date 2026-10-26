@@ -2,7 +2,14 @@
 
 ## Unreleased
 
-The core, headless: context functions, no API or pages yet.
+The core, a REST API and pages, mounted with PhoenixMountable.
+
+* `kunai/2`: the pages of an owner's endpoints, in the app's layout,
+  styled by `kunai.css` (and `kunai-sumi.css`): the list, the form, the
+  secret, a test, the deliveries live, and a delivery with its attempts.
+* `kunai_api/2`: the REST API, with prefixed ids, cursor lists,
+  `Idempotency-Key`, `expand[]`, one error format, and an OpenAPI document
+  with the webhooks themselves.
 
 * A catalog of events (`Kunai.Catalog`), checked when the app compiles,
   with JSON Schemas, redaction and versions.
