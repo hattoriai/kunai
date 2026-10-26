@@ -1,0 +1,11 @@
+/_build
+/deps
+/doc
+/cover
+/priv/plts
+/tmp
+erl_crash.dump
+kunai-*.tar
+*.ez
+*.db
+*.db-*
