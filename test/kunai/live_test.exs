@@ -41,7 +41,7 @@ defmodule Kunai.LiveTest do
 
   test "an endpoint's page: secret, test, deliveries live", %{conn: conn} do
     {endpoint, secret} = endpoint!()
-    {:ok, view, _html} = live(conn, "/webhooks/#{endpoint.id}")
+    {:ok, view, _html} = live(conn, "/webhooks/endpoints/#{endpoint.id}")
 
     assert has_element?(view, "#kunai-secret .kunai-secret-value--hidden")
     refute render(view) =~ secret
@@ -60,7 +60,7 @@ defmodule Kunai.LiveTest do
 
   test "disabled, enabled, rolled and deleted", %{conn: conn} do
     {endpoint, old} = endpoint!()
-    {:ok, view, _html} = live(conn, "/webhooks/#{endpoint.id}")
+    {:ok, view, _html} = live(conn, "/webhooks/endpoints/#{endpoint.id}")
 
     view |> element("button", "Disable") |> render_click()
     assert render(view) =~ "It receives no events until it is enabled"
@@ -78,13 +78,13 @@ defmodule Kunai.LiveTest do
 
   test "an endpoint edited", %{conn: conn} do
     {endpoint, _secret} = endpoint!()
-    {:ok, view, _html} = live(conn, "/webhooks/#{endpoint.id}/edit")
+    {:ok, view, _html} = live(conn, "/webhooks/endpoints/#{endpoint.id}/edit")
 
     view
     |> form("#kunai-endpoint-form", endpoint: %{description: "Shop", payload: "thin"})
     |> render_submit()
 
-    assert_redirect(view, "/webhooks/#{endpoint.id}")
+    assert_redirect(view, "/webhooks/endpoints/#{endpoint.id}")
     assert %{description: "Shop", payload: "thin"} = Kunai.get_endpoint(scope(), endpoint.id)
   end
 
@@ -108,12 +108,32 @@ defmodule Kunai.LiveTest do
     {endpoint, _secret} = endpoint!(%{}, scope: scope("2"))
 
     assert {:error, {:live_redirect, %{to: "/webhooks", flash: %{"error" => _}}}} =
-             live(conn, "/webhooks/#{endpoint.id}")
+             live(conn, "/webhooks/endpoints/#{endpoint.id}")
   end
 
   test "in the app's layout", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/settings/webhooks")
     assert has_element?(view, "#app-layout[data-site='1'] .kunai")
     assert has_element?(view, "a[href='/settings/webhooks/new']")
+  end
+
+  describe "an app's own page" do
+    test "takes over its route only, before the mount, which keeps the others", %{conn: conn} do
+      {endpoint, _secret} = endpoint!()
+
+      {:ok, _view, html} = live(conn, "/custom/webhooks/endpoints/#{endpoint.id}")
+      assert html =~ "Ours: #{endpoint.url}"
+
+      {:ok, _view, html} = live(conn, "/custom/webhooks/new")
+      assert html =~ "Choose where to send events"
+
+      {:ok, _view, html} = live(conn, "/custom/webhooks/endpoints/#{endpoint.id}/edit")
+      assert html =~ "Edit endpoint"
+
+      {:ok, view, _html} = live(conn, "/custom/webhooks")
+
+      assert view |> element("a.kunai-row-link") |> render() =~
+               "/custom/webhooks/endpoints/#{endpoint.id}"
+    end
   end
 end

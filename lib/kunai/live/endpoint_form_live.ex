@@ -9,7 +9,7 @@ defmodule Kunai.Live.EndpointFormLive do
   @impl true
   def mount(params, _session, socket) do
     scope = socket.assigns.kunai_scope
-    catalog = Kunai.Config.catalog()
+    catalog = Kunai.catalog()
 
     case endpoint(socket.assigns.live_action, params, scope) do
       nil ->
@@ -36,7 +36,7 @@ defmodule Kunai.Live.EndpointFormLive do
   end
 
   defp endpoint(:new, _params, _scope),
-    do: %Endpoint{events: ["*"], api_version: Kunai.Config.catalog().latest_version()}
+    do: %Endpoint{events: ["*"], api_version: Kunai.catalog().latest_version()}
 
   defp endpoint(:edit, %{"id" => id}, scope), do: Kunai.get_endpoint(scope, id)
 
@@ -85,7 +85,7 @@ defmodule Kunai.Live.EndpointFormLive do
         {:noreply,
          socket
          |> put_flash(:info, t("Endpoint saved."))
-         |> push_navigate(to: "#{socket.assigns.kunai.base}/#{endpoint.id}")}
+         |> push_navigate(to: endpoint_path(socket.assigns.kunai.base, endpoint))}
 
       {:error, changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -124,7 +124,7 @@ defmodule Kunai.Live.EndpointFormLive do
       </.card>
 
       <div class="kunai-form-actions">
-        <.button variant="primary" icon="chevron-right" navigate={"#{@kunai.base}/#{@endpoint.id}"}>
+        <.button variant="primary" icon="chevron-right" navigate={endpoint_path(@kunai.base, @endpoint)}>
           {t("Go to the endpoint")}
         </.button>
       </div>
@@ -138,7 +138,7 @@ defmodule Kunai.Live.EndpointFormLive do
       <.header
         eyebrow={@kunai.eyebrow}
         title={@page_title}
-        back={if @endpoint.id, do: "#{@kunai.base}/#{@endpoint.id}", else: @kunai.base}
+        back={if @endpoint.id, do: endpoint_path(@kunai.base, @endpoint), else: @kunai.base}
         back_label={if @endpoint.id, do: t("Endpoint"), else: t("Webhooks")}
       >
         <:subtitle :if={!@endpoint.id}>{t("Choose where to send events, and which.")}</:subtitle>
@@ -152,7 +152,7 @@ defmodule Kunai.Live.EndpointFormLive do
         signing={@signing}
         query={@query}
         new?={is_nil(@endpoint.id)}
-        cancel={if @endpoint.id, do: "#{@kunai.base}/#{@endpoint.id}", else: @kunai.base}
+        cancel={if @endpoint.id, do: endpoint_path(@kunai.base, @endpoint), else: @kunai.base}
       />
     </.page>
     """

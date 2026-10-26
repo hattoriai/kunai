@@ -170,29 +170,20 @@ script for copying, in your `app.js`:
 import "../../deps/kunai/priv/static/kunai.js"
 ```
 
-Your app's look is a few lines of CSS: every face, size, colour, radius
-and space of the pages is a `--kunai-*` property, set on `.kunai`, with
-no specificity to fight. Kunai ships a neutral look; an app with a
-serif face, ink buttons and square corners makes it its own with:
+Then make them your app's, a layer at a time (the
+[Customizing guide](guides/customizing.md)):
 
-```css
-.kunai, .kunai-flashes {
-  --kunai-font-display: Palatino, Georgia, serif;
-  --kunai-card-title-font: var(--kunai-font-display);
-  --kunai-text: var(--ink);
-  --kunai-accent: var(--accent);
-  --kunai-primary-background: var(--ink);
-  --kunai-radius: 0;
-  --kunai-button-radius: 0;
-}
-```
-
-The pages are made of `Kunai.Components` (cards, tables of endpoints and
-deliveries, a delivery's attempts, the endpoint form, charts), public and
-documented, so pages of your own can use them, or none: the context
-functions under them (`Kunai`) are the same the pages call. Their text
-goes through your Gettext backend when you name one
-(`config :kunai, gettext: MyAppWeb.Gettext`, domain `"kunai"`).
+* **Tokens**: every face, colour, size, radius and space is a `--kunai-*`
+  property with no specificity; a few lines of CSS give the pages your
+  app's look, or `kunai-daisyui.css` gives them your daisyUI theme.
+* **The frame**: your layout around them (`app_layout`), a line over
+  their titles (`eyebrow`), your hooks before them (`on_mount`).
+* **Words**: through your Gettext (`config :kunai, gettext:`), from
+  `priv/gettext/kunai.pot`, in your languages or your own English.
+* **A page of your own**: `mix kunai.gen.live --only show` copies one into
+  your app, routed before the mount, which keeps the others.
+* **Pages of your own**: `Kunai.Components` and `Kunai.Live.Page`, or none
+  of them, over the same functions the pages call.
 
 **The API** (`kunai_api`) has Stripe's conventions: prefixed ids,
 cursor lists (`starting_after`, `ending_before`), `Idempotency-Key` on

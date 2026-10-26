@@ -117,6 +117,56 @@ defmodule Kunai do
   defdelegate send_test(scope, endpoint, type \\ "kunai.ping"), to: Deliveries
   defdelegate list_audit_log(scope, opts \\ []), to: Kunai.Audit, as: :list
 
+  # What pages need: Kunai's own, and an app's (mix kunai.gen.live).
+
+  @doc "The app's catalog of events (`config :kunai, catalog:`)."
+  @spec catalog() :: module()
+  def catalog, do: Config.catalog()
+
+  @doc """
+  An event as an endpoint receives it: the JSON body, in the endpoint's
+  version, full or thin (`Kunai.Payload`).
+  """
+  @spec payload(Kunai.Event.t(), Kunai.Endpoint.t()) :: map()
+  def payload(%Kunai.Event{} = event, %Kunai.Endpoint{} = endpoint),
+    do: Kunai.Payload.build(Config.catalog(), event, endpoint)
+
+  @doc """
+  What an endpoint receives, for the first of the catalog's events with an
+  example, in the latest version; nil when none has one. For a page that
+  shows a payload before any event was sent.
+  """
+  @spec example_payload() :: map() | nil
+  def example_payload do
+    catalog = Config.catalog()
+
+    with %Kunai.EventType{} = type <- Enum.find(catalog.event_types(), & &1.example) do
+      event = Events.build(catalog, type, type.example, nil, [])
+      payload(event, %Kunai.Endpoint{payload: "full", api_version: event.api_version})
+    end
+  end
+
+  @doc """
+  Subscribes the calling process to an endpoint's deliveries, on Kunai's
+  `:pubsub`. It receives
+
+    * `{:kunai_delivery, event_id}` when a delivery is made, and
+    * `{:kunai_attempt, %{delivery_id: id, attempt: n, status: status}}`
+      after each attempt.
+
+  `{:error, :no_pubsub}` without a `:pubsub`: a page then reads again
+  every few seconds.
+  """
+  @spec subscribe(Kunai.Endpoint.t() | String.t()) :: :ok | {:error, :no_pubsub}
+  def subscribe(%Kunai.Endpoint{id: id}), do: subscribe(id)
+
+  def subscribe(endpoint_id) when is_binary(endpoint_id) do
+    case Kunai.Broadcast.subscribe(endpoint_id) do
+      :error -> {:error, :no_pubsub}
+      ok -> ok
+    end
+  end
+
   @doc """
   Gives a new job to each pending delivery overdue by more than `grace`
   seconds (300): one whose job was lost, as when a node stops in the

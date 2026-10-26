@@ -386,13 +386,29 @@ defmodule Kunai.Components do
     """
   end
 
-  @doc false
+  @doc """
+  The paths of the pages under `base` (`@kunai.base`): every route is its
+  own, so an app's route for one, before the mount, takes it over.
+  """
+  def new_endpoint_path(base), do: "#{base}/new"
+
+  @doc "The path of an endpoint's page. See `new_endpoint_path/1`."
+  def endpoint_path(base, %{id: id}), do: endpoint_path(base, id)
+  def endpoint_path(base, id) when is_binary(id), do: "#{base}/endpoints/#{id}"
+
+  @doc "The path of an endpoint's form. See `new_endpoint_path/1`."
+  def edit_endpoint_path(base, endpoint), do: endpoint_path(base, endpoint) <> "/edit"
+
+  @doc "The path of a delivery's page. See `new_endpoint_path/1`."
+  def delivery_path(base, %{id: id}), do: "#{base}/deliveries/#{id}"
+
+  @doc "The tone of a status, for its pill and colours: `ok`, `wait`, `fail` or `muted`."
   def tone(status) when status in ["enabled", "succeeded"], do: "ok"
   def tone(status) when status in ["pending", "failing"], do: "wait"
   def tone(status) when status in ["disabled", "failed"], do: "fail"
   def tone(_status), do: "muted"
 
-  @doc false
+  @doc "The words for a status, an endpoint's or a delivery's."
   def status_label("enabled"), do: t("Enabled")
   def status_label("disabled"), do: t("Disabled")
   def status_label("succeeded"), do: t("Delivered")
@@ -401,8 +417,10 @@ defmodule Kunai.Components do
   def status_label("failing"), do: t("Failing")
   def status_label(other), do: other
 
-  @doc false
-  # An endpoint enabled but failing is shown as failing.
+  @doc """
+  An endpoint's status as the pages show it: `failing` when it is enabled
+  but its deliveries fail, else its own.
+  """
   def endpoint_status(%{status: "enabled", failing_since: %DateTime{}}), do: "failing"
   def endpoint_status(endpoint), do: endpoint.status
 
@@ -532,7 +550,7 @@ defmodule Kunai.Components do
     """
   end
 
-  @doc false
+  @doc ~s(A time relative to now: "3m ago", "in 4m".)
   def ago(at) do
     seconds = DateTime.diff(DateTime.utc_now(), at)
 
@@ -608,7 +626,7 @@ defmodule Kunai.Components do
         <tbody>
           <tr :for={endpoint <- @endpoints} id={endpoint.id}>
             <td>
-              <.link navigate={"#{@base}/#{endpoint.id}"} class="kunai-row-link">
+              <.link navigate={endpoint_path(@base, endpoint)} class="kunai-row-link">
                 <span class="kunai-mono kunai-strong">{endpoint.url}</span>
               </.link>
               <p :if={endpoint.description} class="kunai-muted kunai-small">{endpoint.description}</p>
@@ -643,31 +661,32 @@ defmodule Kunai.Components do
     """
   end
 
-  @doc false
+  @doc "The share of deliveries tried that did not succeed (`Kunai.Stats`), as words."
   def error_rate(%{success_rate: nil}), do: "—"
 
   def error_rate(%{success_rate: rate}),
     do: t("%{rate}% errors", rate: format_number(Float.round((1 - rate) * 100, 1)))
 
-  @doc false
+  @doc "How many deliveries failed or are retrying (`Kunai.Stats`), as words."
   def failures_hint(%{failed: 0, retrying: 0}), do: t("None failed")
 
   def failures_hint(%{failed: failed, retrying: 0}),
     do: tn("%{count} failed", "%{count} failed", failed)
 
-  def failures_hint(%{failed: 0, retrying: retrying}), do: t("%{count} retrying", count: retrying)
+  def failures_hint(%{failed: 0, retrying: retrying}),
+    do: tn("%{count} retrying", "%{count} retrying", retrying)
 
   def failures_hint(%{failed: failed, retrying: retrying}),
     do: t("%{failed} failed, %{retrying} retrying", failed: failed, retrying: retrying)
 
-  @doc false
+  @doc "The share of deliveries tried that succeeded (`Kunai.Stats`), as a percentage."
   def success_rate(%{success_rate: nil}), do: "—"
   def success_rate(%{success_rate: rate}), do: "#{format_number(Float.round(rate * 100, 1))}%"
 
   defp format_number(float) when float == trunc(float), do: Integer.to_string(trunc(float))
   defp format_number(float), do: :erlang.float_to_binary(float, decimals: 1)
 
-  @doc false
+  @doc "An endpoint's `:events`, in a few words."
   def events_summary(["*"]), do: t("All events")
   def events_summary([one]), do: one
   def events_summary(events), do: tn("%{count} event", "%{count} events", length(events))
@@ -702,7 +721,7 @@ defmodule Kunai.Components do
               <.link :if={@patch} patch={"#{@patch}?delivery=#{delivery.id}"} class="kunai-row-link">
                 <span class="kunai-mono kunai-strong">{delivery.event_type}</span>
               </.link>
-              <.link :if={!@patch} navigate={"#{@base}/deliveries/#{delivery.id}"} class="kunai-row-link">
+              <.link :if={!@patch} navigate={delivery_path(@base, delivery)} class="kunai-row-link">
                 <span class="kunai-mono kunai-strong">{delivery.event_type}</span>
               </.link>
               <p class="kunai-mono kunai-faint kunai-small kunai-truncate">{delivery.event_id}</p>

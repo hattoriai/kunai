@@ -19,7 +19,7 @@ defmodule Kunai.Live.EndpointLive do
 
       endpoint ->
         # Live with Kunai's PubSub, else read again every few seconds.
-        if connected?(socket) and Kunai.Broadcast.subscribe(endpoint.id) == :error,
+        if connected?(socket) and match?({:error, _}, Kunai.subscribe(endpoint)),
           do: :timer.send_interval(@refresh, :refresh)
 
         {:ok,
@@ -50,7 +50,7 @@ defmodule Kunai.Live.EndpointLive do
   # What a test can send: the events the endpoint receives, and a ping.
   defp test_types(endpoint) do
     names =
-      Kunai.Config.catalog().event_types()
+      Kunai.catalog().event_types()
       |> Enum.map(& &1.name)
       |> Enum.filter(fn name ->
         Enum.any?(endpoint.events, &Kunai.Subscriptions.matches?(&1, name))
@@ -81,7 +81,7 @@ defmodule Kunai.Live.EndpointLive do
     case Kunai.get_delivery(scope, id) do
       %Kunai.Delivery{endpoint_id: endpoint_id} = delivery when endpoint_id == endpoint.id ->
         event = Kunai.get_event(scope, delivery.event_id)
-        payload = event && Kunai.Payload.build(Kunai.Config.catalog(), event, endpoint)
+        payload = event && Kunai.payload(event, endpoint)
         assign(socket, delivery: delivery, payload: payload)
 
       _missing ->
@@ -96,7 +96,7 @@ defmodule Kunai.Live.EndpointLive do
         is_nil(value)
       end)
 
-    path = "#{assigns.kunai.base}/#{assigns.endpoint.id}"
+    path = endpoint_path(assigns.kunai.base, assigns.endpoint)
     if query == [], do: path, else: path <> "?" <> URI.encode_query(query)
   end
 
@@ -209,7 +209,7 @@ defmodule Kunai.Live.EndpointLive do
           >
             {t("Enable")}
           </.button>
-          <.button icon="edit" navigate={"#{@kunai.base}/#{@endpoint.id}/edit"}>{t("Edit")}</.button>
+          <.button icon="edit" navigate={edit_endpoint_path(@kunai.base, @endpoint)}>{t("Edit")}</.button>
           <.menu id="kunai-endpoint-menu">
             <:item :if={Kunai.Endpoint.enabled?(@endpoint)} click="disable" icon="pause">
               {t("Disable")}
@@ -256,12 +256,12 @@ defmodule Kunai.Live.EndpointLive do
           <.card title={t("Deliveries")} flush id="kunai-deliveries">
             <:actions>
               <nav class="kunai-segmented" aria-label={t("Filter")}>
-                <.link patch={"#{@kunai.base}/#{@endpoint.id}"} class={["kunai-segment", is_nil(@status) && "is-active"]}>
+                <.link patch={endpoint_path(@kunai.base, @endpoint)} class={["kunai-segment", is_nil(@status) && "is-active"]}>
                   {t("All")}
                 </.link>
                 <.link
                   :for={status <- ~w(succeeded failed pending)}
-                  patch={"#{@kunai.base}/#{@endpoint.id}?status=#{status}"}
+                  patch={endpoint_path(@kunai.base, @endpoint) <> "?status=#{status}"}
                   class={["kunai-segment", @status == status && "is-active"]}
                 >
                   {status_label(status)}
@@ -272,7 +272,7 @@ defmodule Kunai.Live.EndpointLive do
               :if={@deliveries != []}
               deliveries={@deliveries}
               base={@kunai.base}
-              patch={"#{@kunai.base}/#{@endpoint.id}"}
+              patch={endpoint_path(@kunai.base, @endpoint)}
               selected={@delivery && @delivery.id}
             />
             <.empty_state

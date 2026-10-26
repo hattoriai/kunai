@@ -11,7 +11,7 @@ defmodule Kunai.Live.DeliveryLive do
 
     with %Kunai.Delivery{} = delivery <- Kunai.get_delivery(scope, id),
          %Kunai.Endpoint{} = endpoint <- Kunai.get_endpoint(scope, delivery.endpoint_id) do
-      if connected?(socket), do: Kunai.Broadcast.subscribe(endpoint.id)
+      if connected?(socket), do: Kunai.subscribe(endpoint)
       event = Kunai.get_event(scope, delivery.event_id)
 
       {:ok,
@@ -19,7 +19,7 @@ defmodule Kunai.Live.DeliveryLive do
          page_title: delivery.event_type,
          delivery: delivery,
          endpoint: endpoint,
-         payload: event && Kunai.Payload.build(Kunai.Config.catalog(), event, endpoint)
+         payload: event && Kunai.payload(event, endpoint)
        )}
     else
       _missing ->
@@ -57,7 +57,7 @@ defmodule Kunai.Live.DeliveryLive do
     ~H"""
     <.page kunai={@kunai} flash={@flash} class="kunai-narrow">
       <nav class="kunai-crumbs" aria-label={t("Breadcrumb")}>
-        <.link navigate={"#{@kunai.base}/#{@endpoint.id}"} class="kunai-crumb">
+        <.link navigate={endpoint_path(@kunai.base, @endpoint)} class="kunai-crumb">
           <.icon name="arrow-left" />{@endpoint.description || URI.parse(@endpoint.url).host}
         </.link>
       </nav>

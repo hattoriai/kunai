@@ -15,7 +15,15 @@ The core, a REST API and pages, mounted with PhoenixMountable.
 * `emit!/3` in a transaction of the app's repo.
 * `Kunai.recover/1` and `Kunai.Workers.Recover`: deliveries whose job was
   lost get a new one.
-* Text through the app's Gettext backend (`:gettext`).
+* Text through the app's Gettext backend (`:gettext`), from
+  `priv/gettext/kunai.pot`.
+* `mix kunai.gen.live`: Kunai's pages copied into the app, all or some.
+  An endpoint's pages are under `/endpoints/:id`, so that no two routes
+  match one path, and an app's route takes over one page only.
+* `Kunai.catalog/0`, `payload/2`, `example_payload/0` and `subscribe/1`:
+  what the pages call, for pages of an app's own.
+* The Customizing guide: the tokens, the mappings, the frame, the words,
+  a page of the app's own.
 * `kunai_api/2`: the REST API, with prefixed ids, cursor lists,
   `Idempotency-Key`, `expand[]`, one error format, and an OpenAPI document
   with the webhooks themselves.

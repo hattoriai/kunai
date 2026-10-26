@@ -61,7 +61,9 @@ defmodule Kunai.MixProject do
       {:plug, "~> 1.15"},
       {:telemetry, "~> 1.0"},
       {:bandit, "~> 1.5", only: :test},
-      {:stream_data, "~> 1.1", only: :test}
+      {:stream_data, "~> 1.1", only: :test},
+      # Kunai.Text with an app's backend, in the tests.
+      {:gettext, "~> 1.0", only: :test}
     ]
   end
 
@@ -74,7 +76,8 @@ defmodule Kunai.MixProject do
       name: "kunai",
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url},
-      files: ~w(lib priv/static mix.exs .formatter.exs README.md CHANGELOG.md LICENSE NOTICE)
+      files:
+        ~w(lib priv/static priv/gettext guides mix.exs .formatter.exs README.md CHANGELOG.md LICENSE NOTICE)
     ]
   end
 
@@ -84,7 +87,7 @@ defmodule Kunai.MixProject do
       source_ref: "v#{@version}",
       source_url: @source_url,
       assets: %{"media" => "media"},
-      extras: ["README.md", "CHANGELOG.md"]
+      extras: ["README.md", "guides/customizing.md", "CHANGELOG.md"]
     ]
   end
 end

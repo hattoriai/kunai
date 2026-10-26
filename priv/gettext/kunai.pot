@@ -1,0 +1,627 @@
+## Kunai's messages, for an app's translations of its pages
+## (Kunai.Text): copy this file into the app's priv/gettext and run
+## `mix gettext.merge priv/gettext`. Made from Kunai's sources by its
+## tests (UPDATE_POT=1 mix test test/kunai/text_test.exs).
+msgid ""
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "%{count} chosen"
+msgid_plural "%{count} chosen"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/components.ex
+msgid "%{count} event"
+msgid_plural "%{count} events"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/components.ex
+msgid "%{count} failed"
+msgid_plural "%{count} failed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "%{count} needs attention"
+msgid_plural "%{count} need attention"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/components.ex
+msgid "%{count} retrying"
+msgid_plural "%{count} retrying"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/components.ex
+msgid "%{failed} failed, %{retrying} retrying"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "%{ms} ms"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "%{rate}% errors"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "%{span} ago"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "%{time}: %{ok} delivered, %{failed} failed, %{retrying} retrying, %{pending} pending"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "A POST of JSON, for each event, with Standard Webhooks' signature headers."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "A key pair: the endpoint keeps only a public key."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "A new secret signs from now. The old one still signs for a day."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "A secret the endpoint shares."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "A test %{type} is on its way."
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Access"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_form_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Add endpoint"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Advanced"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "All"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "All events"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "All healthy"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "An event reaches the endpoint only when it has the event's access."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "As soon as they can"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Attempt %{n}"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Attempts"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "Average"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/delivery_live.ex
+msgid "Breadcrumb"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Cancel"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Choose where to send events, and which."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Close"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Copy"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Created"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Delete"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Delete this endpoint and its deliveries?"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Delivered"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Deliveries"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Deliveries by hour"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Delivery"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Description"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Details"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Disable"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Disabled"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Disabled after days of failures"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Disabled: the endpoint answered 410 Gone"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Edit"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Edit endpoint"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Enable"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Enabled"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Endpoint"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Endpoint added"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Endpoint deleted."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Endpoint disabled."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Endpoint enabled."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Endpoint id"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Endpoint saved."
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "Endpoints"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Event"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Events"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Events to send"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Every delivery failed for three days. Enable it once it answers, and send the failed ones again."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Every delivery has failed since then, and each is tried again. After three days of failures the endpoint is disabled."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Every event, those added later too."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Failed"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Failing"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Failing since %{when}"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Filter"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Find an event"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Full"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Full: the whole object"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "Give a URL and choose its events: each one is sent to it as it happens, signed, and tried again for three days if it fails."
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Go to the endpoint"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "HTTPS, on an address the internet can reach."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Hidden"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Hide"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "It receives no events until it is enabled."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "It receives no events. Enable it once it is ready to, and send the failed deliveries again."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Its id only: the receiver asks the API for the rest."
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Last 24 hours"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "Listen for this account's events"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "More actions"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Next attempt"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "No body."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "No deliveries"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "No deliveries yet"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "No delivery failed in the last day."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "No delivery has this status."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "No event matches."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "None chosen"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "None failed"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "None here"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Not tried yet."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Now"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "One at a time, in order"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "One delivery is sent again."
+msgid_plural "%{count} deliveries are sent again."
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/kunai/components.ex
+msgid "Open"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Optional"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Order"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Otherwise events arrive as soon as they can, and one failing holds up no other."
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Payload"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Pending"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Request"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Requests follow Standard Webhooks: its libraries verify them in any language. Verify the raw body, before parsing it."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Response"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Response time"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Reveal"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Roll secret"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Roll the secret? The old one still signs for a day, while the endpoint changes to the new one."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Save changes"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Saving…"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send a test event"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send a test event, or wait for the next event."
+msgstr ""
+
+#: lib/kunai/live/delivery_live.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send again"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send again the deliveries that failed in the last day?"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Send failed again"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "Send this account's events to your own systems, signed, as they happen."
+msgstr ""
+
+#: lib/kunai/live/delivery_live.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Sending…"
+msgstr ""
+
+#: lib/kunai/live/delivery_live.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Sent again, with the same webhook-id."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Signed with Ed25519: verify with the public key (whpk_), with Kunai.Verifier or another library that supports v1a."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Signing"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Signing secret"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Status"
+msgstr ""
+
+#: lib/kunai/live/delivery_live.ex
+msgid "That delivery does not exist."
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "That endpoint does not exist."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "The endpoint receives these, and the events added later to a family it chose."
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "The endpoint verifies each request with this public key. Keep it where its code reads it."
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "The endpoint verifies each request with this secret. Keep it where its code reads it, as you would a password."
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "The first 100 endpoints are shown."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "The latest 30 are shown."
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "The test could not be sent."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "The version of the payloads it receives."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "The whole object, as it was when it changed."
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "Thin"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Thin: the object's id"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "To"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "URL"
+msgstr ""
+
+#: lib/kunai/live/endpoint_live.ex
+msgid "Verify signatures"
+msgstr ""
+
+#: lib/kunai/live/endpoint_form_live.ex
+msgid "Verify the requests"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_live.ex
+msgid "Version"
+msgstr ""
+
+#: lib/kunai/components.ex
+#: lib/kunai/live/endpoint_form_live.ex
+#: lib/kunai/live/endpoints_live.ex
+msgid "Webhooks"
+msgstr ""
+
+#: lib/kunai/live/endpoints_live.ex
+msgid "What an endpoint receives"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "What it is for, for the people who look after it"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "in %{ms} ms"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "in %{span}"
+msgstr ""
+
+#: lib/kunai/components.ex
+msgid "just now"
+msgstr ""

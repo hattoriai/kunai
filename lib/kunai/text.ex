@@ -9,6 +9,12 @@ defmodule Kunai.Text do
   (`priv/gettext/<locale>/LC_MESSAGES/kunai.po`); without it, the English
   is shown. A message is its English, with `%{name}` for its values, as
   Gettext's are.
+
+  Kunai's messages are in `priv/gettext/kunai.pot`: copy it into the app's
+  `priv/gettext` and run `mix gettext.merge priv/gettext` for a `kunai.po`
+  in each of its languages. A language is a process's, as Gettext's always
+  is: the pages speak the one the app's `on_mount` hooks set, the hooks
+  the mount runs (`kunai "/webhooks", on_mount: [...]`).
   """
 
   # Gettext is the app's: called only when it is configured.

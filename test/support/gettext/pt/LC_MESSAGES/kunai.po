@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Add endpoint"
+msgstr "Adicionar endpoint"
+
+msgid "%{count} event"
+msgid_plural "%{count} events"
+msgstr[0] "%{count} evento"
+msgstr[1] "%{count} eventos"

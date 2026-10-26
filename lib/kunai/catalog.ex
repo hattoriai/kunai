@@ -33,7 +33,7 @@ defmodule Kunai.Catalog do
 
   An event is emitted in the transaction of the change it tells of, so a
   change rolled back sends nothing and a change committed always sends
-  (`Kunai.emit/5`):
+  (`Kunai.emit/4`):
 
       require MyApp.Webhooks
 
@@ -174,7 +174,7 @@ defmodule Kunai.Catalog do
   defp emit_macros do
     quote unquote: false do
       @doc """
-      Adds an event to a transaction (`Kunai.emit/5`). A name the catalog
+      Adds an event to a transaction (`Kunai.emit/4`). A name the catalog
       does not declare is a compile error.
       """
       defmacro emit(multi, type, data, opts \\ []) do

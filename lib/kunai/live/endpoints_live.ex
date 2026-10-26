@@ -16,26 +16,8 @@ defmodule Kunai.Live.EndpointsLive do
        more?: page.has_more,
        summary: Kunai.Stats.summary(scope),
        stats: Kunai.Stats.by_endpoint(scope),
-       example: example()
+       example: Kunai.example_payload()
      )}
-  end
-
-  # What an endpoint receives: the catalog's first event with an example.
-  defp example do
-    catalog = Kunai.Config.catalog()
-
-    case Enum.find(catalog.event_types(), & &1.example) do
-      nil ->
-        nil
-
-      type ->
-        event = Kunai.Events.build(catalog, type, type.example, nil, [])
-
-        Kunai.Payload.build(catalog, event, %Kunai.Endpoint{
-          payload: "full",
-          api_version: event.api_version
-        })
-    end
   end
 
   @impl true
@@ -45,7 +27,7 @@ defmodule Kunai.Live.EndpointsLive do
       <.header eyebrow={@kunai.eyebrow} title={t("Webhooks")}>
         <:subtitle>{t("Send this account's events to your own systems, signed, as they happen.")}</:subtitle>
         <:actions>
-          <.button :if={@endpoints != []} variant="primary" icon="plus" navigate={"#{@kunai.base}/new"}>
+          <.button :if={@endpoints != []} variant="primary" icon="plus" navigate={new_endpoint_path(@kunai.base)}>
             {t("Add endpoint")}
           </.button>
         </:actions>
@@ -59,7 +41,7 @@ defmodule Kunai.Live.EndpointsLive do
                 {t("Give a URL and choose its events: each one is sent to it as it happens, signed, and tried again for three days if it fails.")}
               </p>
               <:actions>
-                <.button variant="primary" icon="plus" navigate={"#{@kunai.base}/new"}>{t("Add endpoint")}</.button>
+                <.button variant="primary" icon="plus" navigate={new_endpoint_path(@kunai.base)}>{t("Add endpoint")}</.button>
               </:actions>
             </.empty_state>
           </.card>

@@ -69,9 +69,9 @@ defmodule Kunai.Router do
   routes do
     live "/", Kunai.Live.EndpointsLive, :index
     live "/new", Kunai.Live.EndpointFormLive, :new
+    live "/endpoints/:id", Kunai.Live.EndpointLive, :show
+    live "/endpoints/:id/edit", Kunai.Live.EndpointFormLive, :edit
     live "/deliveries/:id", Kunai.Live.DeliveryLive, :show
-    live "/:id", Kunai.Live.EndpointLive, :show
-    live "/:id/edit", Kunai.Live.EndpointFormLive, :edit
   end
 
   @impl PhoenixMountable
