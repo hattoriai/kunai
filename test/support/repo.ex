@@ -12,3 +12,8 @@ defmodule KunaiTest.SQLiteMigrationsRepo do
   @moduledoc "A SQLite database of its own, for the migrations' suite."
   use Ecto.Repo, otp_app: :kunai, adapter: Ecto.Adapters.SQLite3
 end
+
+defmodule KunaiTest.MigrationsRepo do
+  @moduledoc "PostgreSQL out of the sandbox, for the migrations' suite."
+  use Ecto.Repo, otp_app: :kunai, adapter: Ecto.Adapters.Postgres
+end

@@ -1,60 +1,138 @@
 /*
  * Kunai's pages.
  *
- * Every colour, space, radius and font comes from a --kunai-* custom
- * property. Set them on .kunai (or higher) to match the app, or load
- * kunai-sumi.css to map them to the Sumi tokens. The defaults below have
- * no specificity, so a value set on :root, on an ancestor or on .kunai
- * itself wins. They are Masu's, Kotoba's and Koyomi's own defaults, so
- * that a page with them all looks like one thing.
+ * Every colour, face, size, radius and shadow is a --kunai-* custom
+ * property. An app gives its pages its own look by setting them, on
+ * :root or on .kunai, after this file: the defaults below have no
+ * specificity, so any value the app sets wins. kunai-sumi.css and
+ * kunai-daisyui.css set them from Sumi's tokens and daisyUI's themes; the
+ * Theming guide lists each one.
  */
 
 :where(:root) {
-  --kunai-font: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --kunai-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* Faces. The display face is the titles'; the label face the small
+     words above fields and values. */
+  --kunai-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --kunai-font-display: var(--kunai-font);
+  --kunai-font-label: var(--kunai-font);
+  --kunai-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   --kunai-font-size: 0.875rem;
+  --kunai-small: 0.8125rem;
   --kunai-line-height: 1.5;
-  --kunai-text: #1f1f23;
-  --kunai-muted: #6b6b76;
-  --kunai-background: #ffffff;
-  --kunai-surface: #f6f6f7;
-  --kunai-border: #d9d9de;
-  --kunai-rule: #ececef;
-  --kunai-accent: #2f5bd3;
+
+  /* The title of a page, and of a card. */
+  --kunai-title-size: 1.75rem;
+  --kunai-title-weight: 650;
+  --kunai-title-tracking: -0.02em;
+  --kunai-card-title-font: var(--kunai-font);
+  --kunai-card-title-size: 0.9375rem;
+  --kunai-card-title-weight: 600;
+
+  /* The small words: labels, column heads, the eyebrow. */
+  --kunai-label-size: 0.75rem;
+  --kunai-label-weight: 500;
+  --kunai-label-transform: none;
+  --kunai-label-tracking: 0;
+  --kunai-eyebrow: var(--kunai-accent);
+
+  /* Colours. */
+  --kunai-text: #1a1f36;
+  --kunai-muted: #596780;
+  --kunai-faint: #8792a2;
+  --kunai-background: transparent;
+  --kunai-surface: #f6f8fa;
+  --kunai-raised: #ffffff;
+  --kunai-border: #e3e8ee;
+  --kunai-rule: #ebeef1;
+  --kunai-hover: #f6f8fa;
+  --kunai-selected: #f5f4ff;
+  --kunai-accent: #5b5bd6;
   --kunai-accent-text: #ffffff;
-  --kunai-ok: #1d7a46;
-  --kunai-wait: #a86207;
-  --kunai-fail: #c2362b;
-  --kunai-radius: 6px;
-  --kunai-space: 0.5rem;
-  --kunai-field-height: 2.25rem;
-  --kunai-max-width: 64rem;
-  --kunai-transition: 120ms ease-out;
+  --kunai-accent-soft: #eeeefd;
+  --kunai-ok: #0e7a44;
+  --kunai-ok-soft: #e3f6ea;
+  --kunai-ok-chart: #3fb87a;
+  --kunai-wait: #a3570a;
+  --kunai-wait-soft: #fdf1df;
+  --kunai-wait-chart: #f0ac4b;
+  --kunai-fail: #c7302b;
+  --kunai-fail-soft: #fdecea;
+  --kunai-fail-chart: #e8584f;
+  --kunai-code-background: #f6f8fa;
+  --kunai-code-text: var(--kunai-text);
+
+  /* Shapes. */
+  --kunai-radius: 10px;
+  --kunai-radius-field: 7px;
+  --kunai-radius-pill: 999px;
+  --kunai-border-width: 1px;
+  --kunai-shadow: 0 1px 2px rgba(26, 31, 54, 0.05);
+  --kunai-shadow-pop: 0 12px 32px -8px rgba(26, 31, 54, 0.22), 0 2px 6px rgba(26, 31, 54, 0.08);
+  --kunai-focus: 0 0 0 3px color-mix(in oklab, var(--kunai-accent) 28%, transparent);
+
+  /* Buttons. */
+  --kunai-button-height: 2.125rem;
+  --kunai-button-radius: var(--kunai-radius-field);
+  --kunai-button-weight: 550;
+  --kunai-button-transform: none;
+  --kunai-button-tracking: 0;
+  --kunai-primary-background: var(--kunai-accent);
+  --kunai-primary-text: var(--kunai-accent-text);
+  --kunai-primary-hover: color-mix(in oklab, var(--kunai-accent) 86%, #000);
+  --kunai-secondary-background: var(--kunai-raised);
+  --kunai-secondary-border: var(--kunai-border);
+
+  /* Space. */
+  --kunai-space: 0.25rem;
+  --kunai-gap: 1.25rem;
+  --kunai-card-padding: 1.25rem;
+  --kunai-max-width: 76rem;
+  --kunai-drawer-width: 36rem;
+  --kunai-transition: 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Dark: under the app's own switch, a `dark` class or data-theme="dark"
-   on an ancestor. Tokens an app sets itself win. */
+   on an ancestor. */
 :where(.dark, [data-theme="dark"]) {
-  --kunai-text: #ececef;
-  --kunai-muted: #9d9da8;
-  --kunai-background: #141417;
-  --kunai-surface: #1d1d21;
-  --kunai-border: #34343b;
-  --kunai-rule: #26262b;
-  --kunai-accent: #7d9bf0;
-  --kunai-accent-text: #0f1020;
-  --kunai-ok: #5cc28b;
-  --kunai-wait: #e0a54a;
-  --kunai-fail: #ef7b70;
+  --kunai-text: #e6e8ef;
+  --kunai-muted: #a3acc0;
+  --kunai-faint: #737d93;
+  --kunai-surface: #1a1d27;
+  --kunai-raised: #14161f;
+  --kunai-border: #2c303d;
+  --kunai-rule: #232733;
+  --kunai-hover: #1c1f2a;
+  --kunai-selected: #1f1f3a;
+  --kunai-accent: #8c8cf2;
+  --kunai-accent-text: #0e0e22;
+  --kunai-accent-soft: #24244a;
+  --kunai-ok: #5fd197;
+  --kunai-ok-soft: #12301f;
+  --kunai-ok-chart: #3fb87a;
+  --kunai-wait: #f2b968;
+  --kunai-wait-soft: #3a2a12;
+  --kunai-fail: #f3837b;
+  --kunai-fail-soft: #3d1a19;
+  --kunai-code-background: #10121a;
+  --kunai-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --kunai-shadow-pop: 0 16px 40px -8px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
+/* The page. */
 .kunai {
+  container: kunai / inline-size;
   max-width: var(--kunai-max-width);
   margin: 0 auto;
+  background: var(--kunai-background);
+  color: var(--kunai-text);
   font-family: var(--kunai-font);
   font-size: var(--kunai-font-size);
   line-height: var(--kunai-line-height);
-  color: var(--kunai-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.kunai.kunai-narrow {
+  max-width: 48rem;
 }
 
 .kunai *,
@@ -63,63 +141,124 @@
   box-sizing: border-box;
 }
 
-.kunai p {
-  margin: 0 0 var(--kunai-space);
+.kunai :where(p, h1, h2, h3, dl, dd, figure, pre, ol, ul) {
+  margin: 0;
+}
+
+.kunai :where(ol, ul) {
+  padding: 0;
+  list-style: none;
+}
+
+.kunai-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
 }
 
 .kunai-mono {
   font-family: var(--kunai-mono);
-  font-size: 0.95em;
+  font-size: 0.92em;
   overflow-wrap: anywhere;
 }
 
-.kunai-muted {
-  color: var(--kunai-muted);
+.kunai-strong { font-weight: 600; }
+.kunai-muted { color: var(--kunai-muted); }
+.kunai-faint { color: var(--kunai-faint); }
+.kunai-small { font-size: var(--kunai-small); }
+.kunai-text-fail { color: var(--kunai-fail); }
+
+.kunai-truncate {
+  max-width: 16rem;
+  overflow: hidden;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.kunai-link {
-  color: var(--kunai-text);
-  text-decoration: none;
+.kunai-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.kunai-link:hover {
-  color: var(--kunai-accent);
-  text-decoration: underline;
+.kunai :focus-visible {
+  outline: none;
+  box-shadow: var(--kunai-focus);
 }
 
 /* The head of a page. */
 .kunai-header {
-  margin-bottom: calc(var(--kunai-space) * 4);
+  margin-bottom: calc(var(--kunai-gap) * 1.25);
 }
 
-.kunai-back {
-  display: inline-block;
-  margin-bottom: var(--kunai-space);
+.kunai-crumbs {
+  margin-bottom: calc(var(--kunai-space) * 3);
+}
+
+.kunai-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   color: var(--kunai-muted);
+  font-size: var(--kunai-small);
+  font-weight: 500;
   text-decoration: none;
+  transition: color var(--kunai-transition);
 }
 
-.kunai-back:hover {
+.kunai-crumb:hover {
   color: var(--kunai-text);
+}
+
+.kunai-crumb .kunai-icon {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 .kunai-header-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: calc(var(--kunai-space) * 2);
+  gap: var(--kunai-gap);
+}
+
+.kunai-header-text {
+  min-width: 0;
+}
+
+.kunai-eyebrow {
+  margin-bottom: calc(var(--kunai-space) * 2);
+  color: var(--kunai-eyebrow);
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-label-size);
+  font-weight: 600;
+  letter-spacing: var(--kunai-label-tracking);
+  text-transform: var(--kunai-label-transform);
+}
+
+.kunai-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 .kunai-title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.25;
+  font-family: var(--kunai-font-display);
+  font-size: var(--kunai-title-size);
+  font-weight: var(--kunai-title-weight);
+  letter-spacing: var(--kunai-title-tracking);
+  line-height: 1.15;
 }
 
 .kunai-subtitle {
-  margin: calc(var(--kunai-space) / 2) 0 0;
+  margin-top: calc(var(--kunai-space) * 1.5);
+  max-width: 44rem;
   color: var(--kunai-muted);
 }
 
@@ -127,26 +266,97 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--kunai-space);
+  gap: calc(var(--kunai-space) * 2);
 }
 
-/* Sections. */
-.kunai-section {
-  margin-top: calc(var(--kunai-space) * 5);
+/* Cards. */
+.kunai-card {
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-raised);
+  box-shadow: var(--kunai-shadow);
 }
 
-.kunai-section-head {
+.kunai-card + .kunai-card {
+  margin-top: var(--kunai-gap);
+}
+
+.kunai-card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--kunai-space);
-  margin-bottom: calc(var(--kunai-space) * 1.5);
+  gap: var(--kunai-gap);
+  padding: var(--kunai-card-padding) var(--kunai-card-padding) 0;
 }
 
-.kunai-section-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+.kunai-card-title {
+  font-family: var(--kunai-card-title-font);
+  font-size: var(--kunai-card-title-size);
+  font-weight: var(--kunai-card-title-weight);
+  line-height: 1.4;
+}
+
+.kunai-card-description {
+  margin-top: 0.125rem;
+  color: var(--kunai-muted);
+  font-size: var(--kunai-small);
+}
+
+.kunai-card-body {
+  padding: var(--kunai-card-padding);
+}
+
+.kunai-card-head + .kunai-card-body {
+  padding-top: calc(var(--kunai-card-padding) * 0.75);
+}
+
+.kunai-card--flush > .kunai-card-body {
+  padding: calc(var(--kunai-card-padding) * 0.75) 0 0;
+}
+
+.kunai-card-foot {
+  padding: calc(var(--kunai-space) * 3) var(--kunai-card-padding);
+  border-top: var(--kunai-border-width) solid var(--kunai-rule);
+  color: var(--kunai-muted);
+  font-size: var(--kunai-small);
+}
+
+/* Two columns: the main one and a side. */
+.kunai-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  align-items: start;
+  gap: var(--kunai-gap);
+}
+
+.kunai-main,
+.kunai-side,
+.kunai-main > *,
+.kunai-side > * {
+  min-width: 0;
+}
+
+.kunai-main,
+.kunai-side {
+  display: grid;
+  gap: var(--kunai-gap);
+}
+
+.kunai-main .kunai-card + .kunai-card,
+.kunai-side .kunai-card + .kunai-card {
+  margin-top: 0;
+}
+
+/* By the room the pages have in the app's layout, not the window's. */
+@container kunai (max-width: 62rem) {
+  .kunai-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kunai-side {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    align-items: start;
+  }
 }
 
 /* Buttons. */
@@ -154,171 +364,869 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: var(--kunai-field-height);
-  padding: 0 calc(var(--kunai-space) * 1.75);
-  border: 1px solid var(--kunai-border);
-  border-radius: var(--kunai-radius);
-  background: var(--kunai-background);
+  gap: 0.4375rem;
+  height: var(--kunai-button-height);
+  padding: 0 0.875rem;
+  border: var(--kunai-border-width) solid var(--kunai-secondary-border);
+  border-radius: var(--kunai-button-radius);
+  background: var(--kunai-secondary-background);
   color: var(--kunai-text);
+  box-shadow: 0 1px 1px rgba(26, 31, 54, 0.04);
   font: inherit;
-  font-weight: 500;
+  font-size: var(--kunai-small);
+  font-weight: var(--kunai-button-weight);
+  letter-spacing: var(--kunai-button-tracking);
   text-decoration: none;
+  text-transform: var(--kunai-button-transform);
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--kunai-transition), border-color var(--kunai-transition);
+  transition:
+    background var(--kunai-transition),
+    border-color var(--kunai-transition),
+    color var(--kunai-transition),
+    box-shadow var(--kunai-transition),
+    transform var(--kunai-transition);
 }
 
 .kunai-button:hover {
-  background: var(--kunai-surface);
+  background: var(--kunai-hover);
+  border-color: color-mix(in oklab, var(--kunai-secondary-border) 80%, var(--kunai-text));
 }
 
-.kunai-button:focus-visible,
-.kunai-input:focus-visible {
-  outline: 2px solid var(--kunai-accent);
-  outline-offset: 1px;
+.kunai-button:active {
+  transform: translateY(1px);
+}
+
+.kunai-button .kunai-icon {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  color: var(--kunai-muted);
 }
 
 .kunai-button--primary {
-  border-color: var(--kunai-accent);
-  background: var(--kunai-accent);
-  color: var(--kunai-accent-text);
+  border-color: var(--kunai-primary-background);
+  background: var(--kunai-primary-background);
+  color: var(--kunai-primary-text);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--kunai-primary-background) 40%, transparent);
 }
 
 .kunai-button--primary:hover {
-  background: color-mix(in oklab, var(--kunai-accent) 88%, var(--kunai-text));
+  border-color: var(--kunai-primary-hover);
+  background: var(--kunai-primary-hover);
+}
+
+.kunai-button--primary .kunai-icon {
+  color: inherit;
 }
 
 .kunai-button--danger {
   color: var(--kunai-fail);
 }
 
-.kunai-button--quiet {
+.kunai-button--danger .kunai-icon {
+  color: inherit;
+}
+
+.kunai-button--ghost {
   border-color: transparent;
   background: transparent;
+  box-shadow: none;
   color: var(--kunai-muted);
 }
 
-.kunai-button:disabled,
-.kunai-button.phx-submit-loading {
-  opacity: 0.6;
-  cursor: default;
+.kunai-button--ghost:hover {
+  border-color: transparent;
+  background: var(--kunai-hover);
+  color: var(--kunai-text);
 }
 
-/* Statuses. */
-.kunai-status {
+.kunai-button--sm {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+}
+
+.kunai-button--icon {
+  width: var(--kunai-button-height);
+  padding: 0;
+}
+
+.kunai-button--sm.kunai-button--icon {
+  width: 1.75rem;
+}
+
+.kunai-button:disabled,
+.kunai-button.phx-submit-loading,
+.kunai-button.phx-click-loading {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* A menu behind a button. */
+.kunai-menu {
+  position: relative;
+}
+
+.kunai-menu-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.375rem);
+  right: 0;
+  min-width: 13rem;
+  padding: 0.3125rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-raised);
+  box-shadow: var(--kunai-shadow-pop);
+}
+
+.kunai-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.4375rem 0.625rem;
+  border: 0;
+  border-radius: calc(var(--kunai-radius) - 4px);
+  background: none;
+  color: var(--kunai-text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.kunai-menu-item:hover {
+  background: var(--kunai-hover);
+}
+
+.kunai-menu-item .kunai-icon {
+  color: var(--kunai-muted);
+}
+
+.kunai-menu-item--danger,
+.kunai-menu-item--danger .kunai-icon {
+  color: var(--kunai-fail);
+}
+
+/* Pills: statuses, response codes, tags. */
+.kunai-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.375em;
-  font-weight: 500;
+  gap: 0.375rem;
+  height: 1.375rem;
+  padding: 0 0.5rem;
+  border-radius: var(--kunai-radius-pill);
+  background: var(--kunai-surface);
+  color: var(--kunai-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
   white-space: nowrap;
 }
 
-.kunai-status::before {
+.kunai-pill::before {
   content: "";
-  width: 0.5em;
-  height: 0.5em;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: currentColor;
 }
 
-.kunai-status--ok { color: var(--kunai-ok); }
-.kunai-status--wait { color: var(--kunai-wait); }
-.kunai-status--fail { color: var(--kunai-fail); }
-.kunai-status--muted { color: var(--kunai-muted); }
+.kunai-pill--ok { background: var(--kunai-ok-soft); color: var(--kunai-ok); }
+.kunai-pill--wait { background: var(--kunai-wait-soft); color: var(--kunai-wait); }
+.kunai-pill--fail { background: var(--kunai-fail-soft); color: var(--kunai-fail); }
+
+.kunai-code-pill {
+  display: inline-block;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 5px;
+  font-family: var(--kunai-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.kunai-code-pill--ok { background: var(--kunai-ok-soft); color: var(--kunai-ok); }
+.kunai-code-pill--fail { background: var(--kunai-fail-soft); color: var(--kunai-fail); }
+
+.kunai-tag {
+  display: inline-block;
+  padding: 0.125rem 0.4375rem;
+  border: var(--kunai-border-width) solid var(--kunai-rule);
+  border-radius: 6px;
+  background: var(--kunai-surface);
+  font-size: 0.75rem;
+}
+
+.kunai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.kunai-count {
+  color: var(--kunai-muted);
+  font-size: var(--kunai-small);
+  font-weight: 500;
+}
+
+/* Numbers and charts. */
+.kunai-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--kunai-gap);
+  margin-bottom: var(--kunai-gap);
+}
+
+.kunai-metrics > .kunai-metric {
+  padding: var(--kunai-card-padding);
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-raised);
+  box-shadow: var(--kunai-shadow);
+}
+
+.kunai-metric-label {
+  color: var(--kunai-muted);
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-label-size);
+  font-weight: var(--kunai-label-weight);
+  letter-spacing: var(--kunai-label-tracking);
+  text-transform: var(--kunai-label-transform);
+}
+
+.kunai-metric-value {
+  margin-top: 0.25rem;
+  font-family: var(--kunai-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.kunai-metric-value--wait { color: var(--kunai-wait); }
+.kunai-metric-value--fail { color: var(--kunai-fail); }
+
+.kunai-metric-hint {
+  margin-top: 0.125rem;
+  color: var(--kunai-faint);
+  font-size: var(--kunai-small);
+}
+
+.kunai-metric .kunai-chart--mini {
+  margin-top: 0.75rem;
+}
+
+.kunai-overview {
+  display: grid;
+  gap: var(--kunai-gap);
+}
+
+.kunai-overview-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--kunai-gap) * 2);
+}
+
+.kunai-chart svg {
+  display: block;
+  width: 100%;
+  height: 6rem;
+}
+
+.kunai-chart--mini svg {
+  width: 9.5rem;
+  height: 1.5rem;
+}
+
+.kunai-metric .kunai-chart--mini svg {
+  width: 100%;
+}
+
+.kunai-chart-track { fill: var(--kunai-rule); }
+.kunai-chart-ok { fill: var(--kunai-ok-chart); }
+.kunai-chart-fail { fill: var(--kunai-fail-chart); }
+.kunai-chart-wait { fill: var(--kunai-wait-chart); }
+.kunai-chart-pending { fill: var(--kunai-faint); }
+
+.kunai-chart g:hover rect:not(.kunai-chart-track) {
+  opacity: 0.8;
+}
+
+.kunai-chart-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.375rem;
+  color: var(--kunai-faint);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.kunai-activity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.kunai-activity-rate {
+  min-width: 4.5rem;
+  color: var(--kunai-muted);
+  font-size: var(--kunai-small);
+  font-variant-numeric: tabular-nums;
+}
 
 /* Tables. */
+.kunai-table-wrap {
+  overflow-x: auto;
+}
+
 .kunai-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: var(--kunai-font-size);
 }
 
 .kunai-table th {
-  padding: var(--kunai-space) calc(var(--kunai-space) * 1.5);
-  border-bottom: 1px solid var(--kunai-border);
+  padding: 0.5rem 0.875rem;
+  border-bottom: var(--kunai-border-width) solid var(--kunai-rule);
   color: var(--kunai-muted);
-  font-weight: 500;
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-label-size);
+  font-weight: var(--kunai-label-weight);
+  letter-spacing: var(--kunai-label-tracking);
   text-align: left;
+  text-transform: var(--kunai-label-transform);
   white-space: nowrap;
 }
 
+.kunai-table th:first-child,
+.kunai-table td:first-child {
+  padding-left: var(--kunai-card-padding);
+}
+
+.kunai-table th:last-child,
+.kunai-table td:last-child {
+  padding-right: var(--kunai-card-padding);
+}
+
 .kunai-table td {
-  padding: calc(var(--kunai-space) * 1.25) calc(var(--kunai-space) * 1.5);
-  border-bottom: 1px solid var(--kunai-rule);
-  vertical-align: top;
+  padding: 0.75rem 0.875rem;
+  border-bottom: var(--kunai-border-width) solid var(--kunai-rule);
+  vertical-align: middle;
+}
+
+.kunai-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .kunai-table td p {
-  margin: 0.125rem 0 0;
+  margin-top: 0.125rem;
 }
 
-/* The details of an endpoint or a delivery. */
-.kunai-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: calc(var(--kunai-space) * 2);
-  margin: 0;
-  padding: calc(var(--kunai-space) * 2);
-  border: 1px solid var(--kunai-rule);
-  border-radius: var(--kunai-radius);
+/* A row is a link: its first link covers it. */
+.kunai-table--rows tbody tr {
+  position: relative;
+  transition: background var(--kunai-transition);
+}
+
+.kunai-table--rows tbody tr:hover {
+  background: var(--kunai-hover);
+}
+
+.kunai-table--rows tbody tr.is-selected {
+  background: var(--kunai-selected);
+}
+
+.kunai-row-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kunai-row-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.kunai-col-num { text-align: right !important; font-variant-numeric: tabular-nums; }
+.kunai-col-when { white-space: nowrap; }
+.kunai-col-end { width: 2rem; text-align: right !important; }
+
+@container kunai (max-width: 48rem) {
+  .kunai-col-chart,
+  .kunai-col-when,
+  .kunai-col-num {
+    display: none;
+  }
+}
+
+/* A segmented filter. */
+.kunai-segmented {
+  display: inline-flex;
+  padding: 0.1875rem;
+  border-radius: var(--kunai-radius-field);
   background: var(--kunai-surface);
 }
 
-.kunai-details dt {
+.kunai-segment {
+  padding: 0.1875rem 0.625rem;
+  border-radius: calc(var(--kunai-radius-field) - 2px);
   color: var(--kunai-muted);
-  font-size: 0.8125rem;
+  font-size: var(--kunai-small);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--kunai-transition), color var(--kunai-transition);
 }
 
-.kunai-details dd {
-  margin: 0.125rem 0 0;
+.kunai-segment:hover {
+  color: var(--kunai-text);
 }
 
-/* Notices, flashes and the empty list. */
-.kunai-notice,
-.kunai-flash {
-  margin: 0 0 calc(var(--kunai-space) * 2);
-  padding: calc(var(--kunai-space) * 1.25) calc(var(--kunai-space) * 1.75);
-  border: 1px solid var(--kunai-rule);
-  border-left: 3px solid var(--kunai-muted);
-  border-radius: var(--kunai-radius);
+.kunai-segment.is-active {
+  background: var(--kunai-raised);
+  color: var(--kunai-text);
+  box-shadow: 0 1px 2px rgba(26, 31, 54, 0.1);
+}
+
+/* Labelled values. */
+.kunai-properties {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.kunai-property dt {
+  margin-bottom: 0.1875rem;
+  color: var(--kunai-muted);
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-label-size);
+  font-weight: var(--kunai-label-weight);
+  letter-spacing: var(--kunai-label-tracking);
+  text-transform: var(--kunai-label-transform);
+}
+
+.kunai-inline-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.kunai-inline-copy > .kunai-truncate {
+  min-width: 0;
+}
+
+.kunai-inline-copy > :last-child {
+  flex-shrink: 0;
+}
+
+/* Copying: shown once kunai.js is in the page. */
+.kunai-copy {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 1.625rem;
+  height: 1.625rem;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--kunai-faint);
+  cursor: pointer;
+  transition: background var(--kunai-transition), color var(--kunai-transition);
+}
+
+.kunai-js .kunai-copy {
+  display: inline-flex;
+}
+
+.kunai-copy:hover {
+  background: var(--kunai-hover);
+  color: var(--kunai-text);
+}
+
+.kunai-copy .kunai-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.kunai-copy-done,
+.kunai-copy[data-copied] .kunai-copy-idle {
+  display: none;
+}
+
+.kunai-copy[data-copied] .kunai-copy-done {
+  display: block;
+  color: var(--kunai-ok);
+}
+
+/* Secrets and code. */
+.kunai-secret {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius-field);
+  background: var(--kunai-code-background);
+}
+
+.kunai-secret-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--kunai-mono);
+  font-size: var(--kunai-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kunai-secret-value--hidden {
+  color: var(--kunai-faint);
+  letter-spacing: 0.04em;
+}
+
+.kunai-code {
+  position: relative;
+  border: var(--kunai-border-width) solid var(--kunai-rule);
+  border-radius: var(--kunai-radius-field);
+  background: var(--kunai-code-background);
+}
+
+.kunai-code .kunai-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.kunai-code pre,
+.kunai-pre {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+  color: var(--kunai-code-text);
+  font-family: var(--kunai-mono);
+  font-size: 0.78125rem;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+.kunai-pre {
+  border: var(--kunai-border-width) solid var(--kunai-rule);
+  border-radius: var(--kunai-radius-field);
+  background: var(--kunai-code-background);
+}
+
+/* Tabs. */
+.kunai-tab-list {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 0.875rem;
+  border-bottom: var(--kunai-border-width) solid var(--kunai-rule);
+}
+
+.kunai-tab {
+  margin-bottom: -1px;
+  padding: 0.375rem 0 0.5rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--kunai-muted);
+  font: inherit;
+  font-size: var(--kunai-small);
+  font-weight: 550;
+  cursor: pointer;
+  transition: color var(--kunai-transition), border-color var(--kunai-transition);
+}
+
+.kunai-tab:hover {
+  color: var(--kunai-text);
+}
+
+.kunai-tab.is-active {
+  border-bottom-color: var(--kunai-accent);
+  color: var(--kunai-text);
+}
+
+.kunai-tab-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* A delivery. */
+.kunai-delivery {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.kunai-delivery-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--kunai-gap);
+}
+
+.kunai-delivery-title {
+  font-family: var(--kunai-mono);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.kunai-delivery .kunai-properties {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 1rem;
+  border-radius: var(--kunai-radius-field);
   background: var(--kunai-surface);
 }
 
-.kunai-notice--fail,
-.kunai-flash--error { border-left-color: var(--kunai-fail); }
-.kunai-notice--wait { border-left-color: var(--kunai-wait); }
-.kunai-flash--info { border-left-color: var(--kunai-ok); }
-
-.kunai-flash {
-  cursor: pointer;
+.kunai-section-label {
+  margin-bottom: 0.75rem;
+  color: var(--kunai-muted);
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-label-size);
+  font-weight: 600;
+  letter-spacing: var(--kunai-label-tracking);
+  text-transform: var(--kunai-label-transform);
 }
 
-.kunai-empty {
-  padding: calc(var(--kunai-space) * 6) calc(var(--kunai-space) * 3);
-  border: 1px dashed var(--kunai-border);
+.kunai-headers {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border: var(--kunai-border-width) solid var(--kunai-rule);
+  border-radius: var(--kunai-radius-field);
+  font-size: 0.78125rem;
+}
+
+.kunai-headers > div {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.kunai-headers dt {
+  color: var(--kunai-muted);
+}
+
+.kunai-response {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.kunai-response-line {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* The attempts, as a timeline. */
+.kunai-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 0.875rem;
+  padding-bottom: 1rem;
+}
+
+.kunai-timeline-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 1.0625rem;
+  bottom: 0;
+  left: 0.3125rem;
+  width: 1px;
+  background: var(--kunai-border);
+}
+
+.kunai-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.kunai-timeline-dot {
+  flex: none;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  margin-top: 0.3125rem;
+  border: 2px solid var(--kunai-raised);
+  border-radius: 50%;
+  background: var(--kunai-faint);
+  box-shadow: 0 0 0 1px var(--kunai-border);
+}
+
+.kunai-timeline-item--ok .kunai-timeline-dot { background: var(--kunai-ok-chart); box-shadow: none; }
+.kunai-timeline-item--fail .kunai-timeline-dot { background: var(--kunai-fail-chart); box-shadow: none; }
+
+.kunai-timeline-item--next .kunai-timeline-dot {
+  background: var(--kunai-raised);
+  box-shadow: 0 0 0 1.5px var(--kunai-wait-chart);
+}
+
+.kunai-timeline-body p:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* The panel of a delivery, beside the list. */
+.kunai-drawer-backdrop {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  background: color-mix(in oklab, var(--kunai-text) 18%, transparent);
+  animation: kunai-fade 160ms ease-out;
+}
+
+.kunai-drawer {
+  position: fixed;
+  z-index: 41;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(var(--kunai-drawer-width), 100vw);
+  padding: 1.5rem;
+  overflow-y: auto;
+  border-left: var(--kunai-border-width) solid var(--kunai-border);
+  background: var(--kunai-raised);
+  box-shadow: var(--kunai-shadow-pop);
+  animation: kunai-slide 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes kunai-fade { from { opacity: 0; } }
+@keyframes kunai-slide { from { transform: translateX(2rem); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .kunai-drawer,
+  .kunai-drawer-backdrop {
+    animation: none;
+  }
+}
+
+/* Notices and flashes. */
+.kunai-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: var(--kunai-gap);
+  padding: 0.875rem 1rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
   border-radius: var(--kunai-radius);
+  background: var(--kunai-raised);
+}
+
+.kunai-notice-icon {
+  margin-top: 0.125rem;
+}
+
+.kunai-notice-text {
+  flex: 1;
+  color: var(--kunai-muted);
+}
+
+.kunai-notice-title {
+  margin-bottom: 0.125rem;
+  color: var(--kunai-text);
+  font-weight: 600;
+}
+
+.kunai-notice--warning { border-color: color-mix(in oklab, var(--kunai-wait) 30%, var(--kunai-border)); background: var(--kunai-wait-soft); }
+.kunai-notice--warning .kunai-notice-icon { color: var(--kunai-wait); }
+.kunai-notice--danger { border-color: color-mix(in oklab, var(--kunai-fail) 30%, var(--kunai-border)); background: var(--kunai-fail-soft); }
+.kunai-notice--danger .kunai-notice-icon { color: var(--kunai-fail); }
+.kunai-notice--info .kunai-notice-icon { color: var(--kunai-muted); }
+
+.kunai-flashes {
+  position: fixed;
+  z-index: 50;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.5rem;
+  max-width: 24rem;
+}
+
+.kunai-flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius);
+  background: var(--kunai-raised);
+  box-shadow: var(--kunai-shadow-pop);
+  cursor: pointer;
+  animation: kunai-slide 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.kunai-flash .kunai-icon { margin-top: 0.125rem; }
+.kunai-flash--info .kunai-icon { color: var(--kunai-ok); }
+.kunai-flash--error .kunai-icon { color: var(--kunai-fail); }
+
+/* The empty list. */
+.kunai-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1.5rem;
   text-align: center;
 }
 
+.kunai-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 12px;
+  background: var(--kunai-accent-soft);
+  color: var(--kunai-accent);
+}
+
+.kunai-empty-icon .kunai-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
 .kunai-empty-title {
-  font-size: 1rem;
+  font-family: var(--kunai-font-display);
+  font-size: 1.0625rem;
   font-weight: 600;
+}
+
+.kunai-empty-text {
+  max-width: 28rem;
+  color: var(--kunai-muted);
+}
+
+.kunai-empty .kunai-actions {
+  margin-top: 0.75rem;
+}
+
+.kunai-onboarding {
+  display: grid;
+  gap: var(--kunai-gap);
 }
 
 /* Forms. */
 .kunai-form {
   display: grid;
-  gap: calc(var(--kunai-space) * 3);
-  max-width: 40rem;
+  gap: var(--kunai-gap);
 }
 
-.kunai-field {
+.kunai-form .kunai-card + .kunai-card {
+  margin-top: 0;
+}
+
+.kunai-fields {
   display: grid;
-  gap: calc(var(--kunai-space) / 2);
+  gap: 1.25rem;
 }
 
+.kunai-field,
 .kunai-fieldset {
   display: grid;
-  gap: var(--kunai-space);
+  gap: 0.375rem;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
@@ -326,18 +1234,62 @@
 
 .kunai-label {
   padding: 0;
+  color: var(--kunai-text);
+  font-family: var(--kunai-font-label);
+  font-size: var(--kunai-small);
   font-weight: 600;
+  letter-spacing: var(--kunai-label-tracking);
+  text-transform: var(--kunai-label-transform);
+}
+
+.kunai-label .kunai-faint {
+  margin-left: 0.25rem;
+  font-weight: 400;
+  text-transform: none;
 }
 
 .kunai-input {
   width: 100%;
-  height: var(--kunai-field-height);
-  padding: 0 calc(var(--kunai-space) * 1.25);
-  border: 1px solid var(--kunai-border);
-  border-radius: var(--kunai-radius);
-  background: var(--kunai-background);
+  height: var(--kunai-button-height);
+  padding: 0 0.75rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius-field);
+  background: var(--kunai-raised);
   color: var(--kunai-text);
+  box-shadow: inset 0 1px 1px rgba(26, 31, 54, 0.03);
   font: inherit;
+  transition: border-color var(--kunai-transition), box-shadow var(--kunai-transition);
+}
+
+.kunai-input::placeholder {
+  color: var(--kunai-faint);
+}
+
+.kunai-input:focus {
+  outline: none;
+  border-color: var(--kunai-accent);
+  box-shadow: var(--kunai-focus);
+}
+
+.kunai-input--bare {
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.kunai-input--bare:focus {
+  box-shadow: none;
+}
+
+.kunai-select {
+  padding-right: 2rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238792a2' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
 }
 
 .kunai-field--invalid .kunai-input {
@@ -345,91 +1297,174 @@
 }
 
 .kunai-hint {
-  margin: 0;
-  color: var(--kunai-muted);
-  font-size: 0.8125rem;
+  color: var(--kunai-faint);
+  font-size: var(--kunai-small);
 }
 
 .kunai-error {
-  margin: 0;
   color: var(--kunai-fail);
-  font-size: 0.8125rem;
+  font-size: var(--kunai-small);
+  font-weight: 500;
 }
 
-.kunai-check {
+.kunai-radio {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem var(--kunai-space);
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius-field);
   cursor: pointer;
+  transition: border-color var(--kunai-transition), background var(--kunai-transition);
 }
 
-.kunai-check input {
-  margin: 0;
+.kunai-radio:has(input:checked) {
+  border-color: var(--kunai-accent);
+  background: var(--kunai-accent-soft);
+}
+
+.kunai-radio > span {
+  display: grid;
+}
+
+.kunai :is(.kunai-radio, .kunai-option, .kunai-chip) input {
+  flex: none;
+  margin: 0.1875rem 0 0;
   accent-color: var(--kunai-accent);
 }
 
-.kunai-check .kunai-muted {
-  flex-basis: 100%;
-  padding-left: 1.5rem;
-  font-size: 0.8125rem;
-}
-
-.kunai-family {
+/* The events' picker. */
+.kunai-picker {
   display: grid;
-  gap: calc(var(--kunai-space) / 2);
+  border-top: var(--kunai-border-width) solid var(--kunai-rule);
 }
 
-.kunai-checks {
-  display: grid;
-  gap: calc(var(--kunai-space) / 2);
-  padding-left: 1.5rem;
+.kunai-picker-error {
+  padding: 0.75rem var(--kunai-card-padding) 0;
 }
 
-.kunai-inline {
+.kunai-picker-search {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--kunai-space);
-  max-width: 32rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem var(--kunai-card-padding);
+  border-bottom: var(--kunai-border-width) solid var(--kunai-rule);
 }
 
-.kunai-inline .kunai-input {
-  flex: 1;
-  width: auto;
+.kunai-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.625rem var(--kunai-card-padding);
+  border-bottom: var(--kunai-border-width) solid var(--kunai-rule);
+  cursor: pointer;
+  transition: background var(--kunai-transition);
 }
 
-/* Secrets and payloads. */
-.kunai-secret {
-  font-family: var(--kunai-mono);
-  max-width: 40rem;
+.kunai-option:hover {
+  background: var(--kunai-hover);
 }
 
-.kunai-code {
-  margin: 0;
-  padding: calc(var(--kunai-space) * 2);
-  overflow-x: auto;
-  border: 1px solid var(--kunai-rule);
-  border-radius: var(--kunai-radius);
+.kunai-option:has(input:checked) {
+  background: var(--kunai-selected);
+}
+
+.kunai-option-text {
+  display: grid;
+  gap: 0.0625rem;
+}
+
+.kunai-option-text .kunai-muted {
+  font-size: var(--kunai-small);
+}
+
+.kunai-option--family {
   background: var(--kunai-surface);
-  font-family: var(--kunai-mono);
-  font-size: 0.8125rem;
-  line-height: 1.6;
 }
 
-.kunai-snippet {
-  display: block;
-  max-width: 24rem;
-  overflow: hidden;
-  color: var(--kunai-muted);
-  font-family: var(--kunai-mono);
-  font-size: 0.8125rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.kunai-option--event {
+  padding-left: calc(var(--kunai-card-padding) + 1.75rem);
 }
 
-@media (max-width: 40rem) {
-  .kunai-table th:nth-child(n + 4),
-  .kunai-table td:nth-child(n + 4) {
-    display: none;
-  }
+.kunai-family:last-child .kunai-option:last-child {
+  border-bottom: 0;
+}
+
+.kunai-picker-none {
+  padding: 1rem var(--kunai-card-padding);
+}
+
+.kunai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: var(--kunai-border-width) solid var(--kunai-border);
+  border-radius: var(--kunai-radius-pill);
+  cursor: pointer;
+  transition: border-color var(--kunai-transition), background var(--kunai-transition);
+}
+
+.kunai-chip input {
+  margin: 0 !important;
+}
+
+.kunai-chip:has(input:checked) {
+  border-color: var(--kunai-accent);
+  background: var(--kunai-accent-soft);
+}
+
+.kunai-advanced > summary {
+  align-items: center;
+  padding-bottom: var(--kunai-card-padding);
+  list-style: none;
+  cursor: pointer;
+}
+
+.kunai-advanced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.kunai-advanced[open] > summary {
+  padding-bottom: 0;
+}
+
+.kunai-advanced-chevron {
+  transition: transform var(--kunai-transition);
+}
+
+.kunai-advanced[open] .kunai-advanced-chevron {
+  transform: rotate(180deg);
+}
+
+.kunai-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.kunai-card + .kunai-form-actions {
+  margin-top: var(--kunai-gap);
+}
+
+.kunai-inline-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.kunai-inline-form .kunai-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.kunai-side .kunai-tab-list {
+  gap: 1rem;
+}
+
+.kunai-side .kunai-pre {
+  font-size: 0.71875rem;
+}
+
+.kunai-side .kunai-hint {
+  margin-top: 0.75rem;
 }

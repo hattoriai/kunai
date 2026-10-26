@@ -2,7 +2,6 @@ defmodule Kunai.MigrationsTest do
   # Migrates a schema, or a database, of its own, out of the sandbox.
   use ExUnit.Case, async: false
 
-  alias Ecto.Adapters.SQL.Sandbox
   alias PhoenixMountable.Migrations.Test, as: Suite
 
   test "up, down and up again, upgrades, and what a host adds is kept" do
@@ -10,9 +9,13 @@ defmodule Kunai.MigrationsTest do
 
     case repo.__adapter__() do
       Ecto.Adapters.Postgres ->
-        Sandbox.unboxed_run(repo, fn ->
-          Suite.run_suite(repo, Kunai.Migrations, prefix: "kunai_migrations")
-        end)
+        # A pool of its own: the sandbox's connection, shared, can be
+        # busy with what an earlier test left running.
+        config = Keyword.drop(repo.config(), [:pool, :otp_app])
+
+        {:ok, _pid} = KunaiTest.MigrationsRepo.start_link(Keyword.put(config, :pool_size, 2))
+
+        Suite.run_suite(KunaiTest.MigrationsRepo, Kunai.Migrations, prefix: "kunai_migrations")
 
       Ecto.Adapters.SQLite3 ->
         path = Path.expand("../../tmp/kunai_migrations.db", __DIR__)

@@ -166,6 +166,13 @@ defmodule Kunai.Catalog do
       @spec latest_version() :: String.t() | nil
       def latest_version, do: List.last(versions())
 
+      unquote(emit_macros())
+    end
+  end
+
+  # The catalog's emit/4 and emit!/3, which check the event's name.
+  defp emit_macros do
+    quote unquote: false do
       @doc """
       Adds an event to a transaction (`Kunai.emit/5`). A name the catalog
       does not declare is a compile error.
@@ -181,6 +188,19 @@ defmodule Kunai.Catalog do
             unquote(data),
             unquote(opts)
           )
+        end
+      end
+
+      @doc """
+      Emits an event now (`Kunai.emit!/3`): inside a transaction of the
+      app's repo (`Repo.transact/1`), in that transaction. A name the
+      catalog does not declare is a compile error.
+      """
+      defmacro emit!(type, data, opts \\ []) do
+        Kunai.Catalog.__check_name__(__MODULE__, type, __CALLER__)
+
+        quote do
+          Kunai.emit!(unquote(__MODULE__), unquote(type), unquote(data), unquote(opts))
         end
       end
     end

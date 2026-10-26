@@ -48,7 +48,16 @@ config :kunai, vault: {Kunai.Vault.Cloak, vault: MyApp.Vault}
 
 config :my_app, Oban,
   queues: [kunai: 20],
-  plugins: [{Oban.Plugins.Cron, crontab: [{"17 3 * * *", Kunai.Workers.Prune}]}]
+  plugins: [
+    # Jobs stuck executing when a node stopped run again.
+    Oban.Plugins.Lifeline,
+    {Oban.Plugins.Cron,
+     crontab: [
+       # Deliveries whose job was lost get a new one.
+       {"*/5 * * * *", Kunai.Workers.Recover},
+       {"17 3 * * *", Kunai.Workers.Prune}
+     ]}
+  ]
 ```
 
 The tables are a migration of yours, pinned to a version
@@ -67,6 +76,17 @@ Ecto.Multi.new()
 |> Ecto.Multi.update(:page, Page.publish_changeset(page))
 |> MyApp.Webhooks.emit("page.published", & &1.page, scope: scope, previous: %{title: page.title})
 |> Repo.transaction()
+```
+
+Or, in a transaction of your repo's, `emit!`, which joins it:
+
+```elixir
+Repo.transact(fn ->
+  with {:ok, page} <- Repo.update(Page.publish_changeset(page)) do
+    MyApp.Webhooks.emit!("page.published", page, scope: scope)
+    {:ok, page}
+  end
+end)
 ```
 
 Each event is kept once (`Kunai.Event`), with who made the change (a
@@ -115,7 +135,10 @@ scope "/settings" do
 
   kunai "/webhooks",
     on_mount: [{MyAppWeb.UserAuth, :require_authenticated}],
-    app_layout: {MyAppWeb.Layouts, :app}
+    # Your layout component, given flash and current_scope, around the pages.
+    app_layout: {MyAppWeb.Layouts, :app},
+    # A line over each page's title.
+    eyebrow: "Settings"
 end
 
 scope "/api/v1" do
@@ -131,13 +154,45 @@ Both read the request's scope where your pipeline and hooks put it
 endpoints, the form of one (its events, its access, full or thin
 payloads, order, version, signing), its secret to reveal and roll, a test
 to send, its deliveries live over PubSub, and each delivery with its
-attempts and its payload, to send again. They render in your layout,
-styled by a style sheet you import, every colour a `--kunai-*` property:
+attempts and its payload, to send again. Over them, the last day's
+deliveries by hour and how they went (`Kunai.Stats`).
+
+They render in your layout, styled by a style sheet you import, and a
+script for copying, in your `app.js`:
 
 ```css
 @import "../../deps/kunai/priv/static/kunai.css";
-/* @import "../../deps/kunai/priv/static/kunai-sumi.css"; */
+/* Your daisyUI theme's colours and radii: */
+/* @import "../../deps/kunai/priv/static/kunai-daisyui.css"; */
 ```
+
+```js
+import "../../deps/kunai/priv/static/kunai.js"
+```
+
+Your app's look is a few lines of CSS: every face, size, colour, radius
+and space of the pages is a `--kunai-*` property, set on `.kunai`, with
+no specificity to fight. Kunai ships a neutral look; an app with a
+serif face, ink buttons and square corners makes it its own with:
+
+```css
+.kunai, .kunai-flashes {
+  --kunai-font-display: Palatino, Georgia, serif;
+  --kunai-card-title-font: var(--kunai-font-display);
+  --kunai-text: var(--ink);
+  --kunai-accent: var(--accent);
+  --kunai-primary-background: var(--ink);
+  --kunai-radius: 0;
+  --kunai-button-radius: 0;
+}
+```
+
+The pages are made of `Kunai.Components` (cards, tables of endpoints and
+deliveries, a delivery's attempts, the endpoint form, charts), public and
+documented, so pages of your own can use them, or none: the context
+functions under them (`Kunai`) are the same the pages call. Their text
+goes through your Gettext backend when you name one
+(`config :kunai, gettext: MyAppWeb.Gettext`, domain `"kunai"`).
 
 **The API** (`kunai_api`) has Stripe's conventions: prefixed ids,
 cursor lists (`starting_after`, `ending_before`), `Idempotency-Key` on

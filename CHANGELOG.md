@@ -4,9 +4,18 @@
 
 The core, a REST API and pages, mounted with PhoenixMountable.
 
-* `kunai/2`: the pages of an owner's endpoints, in the app's layout,
-  styled by `kunai.css` (and `kunai-sumi.css`): the list, the form, the
-  secret, a test, the deliveries live, and a delivery with its attempts.
+* `kunai/2`: the pages of an owner's endpoints, in the app's layout
+  (`app_layout`, `eyebrow`): the list with the last day's deliveries, the
+  form, the secret, a test, an endpoint's deliveries live with each in a
+  drawer, and a delivery with its attempts.
+* The pages' look as `--kunai-*` properties (`kunai.css`), with
+  `kunai-daisyui.css` and `kunai-sumi.css`; `kunai.js` for copying.
+* `Kunai.Components`, public: the pages' parts, for pages of an app's own.
+* `Kunai.Stats`: deliveries by hour and state, the retrying apart.
+* `emit!/3` in a transaction of the app's repo.
+* `Kunai.recover/1` and `Kunai.Workers.Recover`: deliveries whose job was
+  lost get a new one.
+* Text through the app's Gettext backend (`:gettext`).
 * `kunai_api/2`: the REST API, with prefixed ids, cursor lists,
   `Idempotency-Key`, `expand[]`, one error format, and an OpenAPI document
   with the webhooks themselves.

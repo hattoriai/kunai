@@ -161,6 +161,26 @@ defmodule Kunai.Deliveries do
     do: Deliver.new(%{"delivery_id" => delivery_id}, Keyword.put(opts, :queue, Config.queue()))
 
   @doc false
+  # Pending deliveries overdue by more than `grace` seconds have lost their
+  # job (its node stopped, or it was discarded): each gets a new one. A
+  # delivery that waits keeps next_attempt_at ahead (Kunai.Sender), and
+  # a job too many finds the delivery claimed, and goes away.
+  def recover(grace) do
+    cutoff = DateTime.add(DateTime.utc_now(), -grace, :second)
+
+    ids =
+      Delivery
+      |> where([d], d.status == "pending" and d.next_attempt_at < ^cutoff)
+      |> order_by([d], d.next_attempt_at)
+      |> limit(1_000)
+      |> select([d], d.id)
+      |> Config.repo().all(Config.repo_opts())
+
+    if ids != [], do: Oban.insert_all(Config.oban(), Enum.map(ids, &job/1))
+    length(ids)
+  end
+
+  @doc false
   # A pending delivery due now, with a job of its own: jobs it had for later
   # find it done, or not due, and go away (Kunai.Sender).
   def kick(delivery_id) do

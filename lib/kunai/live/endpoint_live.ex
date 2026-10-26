@@ -1,21 +1,21 @@
 defmodule Kunai.Live.EndpointLive do
   @moduledoc false
-  # An endpoint: what it receives, its secret, a test, and its deliveries,
-  # live.
+  # An endpoint: how its deliveries go, each one opened beside the list,
+  # its details, its secret and a test. Live.
 
-  use Phoenix.LiveView
-  use PhoenixMountable.Path, mountable: Kunai.Router
-
-  import Kunai.Components
+  use Kunai.Live.Page
 
   @refresh 5_000
+  @statuses ~w(succeeded failed pending)
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     case Kunai.get_endpoint(socket.assigns.kunai_scope, id) do
       nil ->
         {:ok,
-         socket |> put_flash(:error, "That endpoint does not exist.") |> push_navigate(to: ~m"/")}
+         socket
+         |> put_flash(:error, t("That endpoint does not exist."))
+         |> push_navigate(to: socket.assigns.kunai.base)}
 
       endpoint ->
         # Live with Kunai's PubSub, else read again every few seconds.
@@ -23,18 +23,31 @@ defmodule Kunai.Live.EndpointLive do
           do: :timer.send_interval(@refresh, :refresh)
 
         {:ok,
-         socket
-         |> assign(
-           page_title: endpoint.description || endpoint.url,
+         assign(socket,
+           page_title: endpoint.description || URI.parse(endpoint.url).host,
            endpoint: endpoint,
            secret: nil,
-           test_types: test_types(endpoint)
-         )
-         |> load_deliveries()}
+           ed25519?: String.starts_with?(Kunai.secret(endpoint) || "", "whpk_"),
+           test_types: test_types(endpoint),
+           status: nil,
+           delivery: nil,
+           payload: nil
+         )}
     end
   end
 
-  # What a test can send: the events the endpoint receives, or a ping.
+  @impl true
+  def handle_params(params, _uri, socket) do
+    status = if params["status"] in @statuses, do: params["status"]
+
+    {:noreply,
+     socket
+     |> assign(status: status)
+     |> load()
+     |> open(params["delivery"])}
+  end
+
+  # What a test can send: the events the endpoint receives, and a ping.
   defp test_types(endpoint) do
     names =
       Kunai.Config.catalog().event_types()
@@ -47,29 +60,60 @@ defmodule Kunai.Live.EndpointLive do
     ["kunai.ping" | names]
   end
 
-  defp load_deliveries(socket) do
-    page =
-      Kunai.list_deliveries(socket.assigns.kunai_scope,
-        endpoint_id: socket.assigns.endpoint.id,
-        limit: 25
-      )
+  defp load(socket) do
+    %{kunai_scope: scope, endpoint: endpoint, status: status} = socket.assigns
+    opts = [endpoint_id: endpoint.id, limit: 30] ++ if(status, do: [status: status], else: [])
+    page = Kunai.list_deliveries(scope, opts)
 
-    assign(socket, deliveries: page.data, more?: page.has_more)
+    assign(socket,
+      deliveries: page.data,
+      more?: page.has_more,
+      summary: Kunai.Stats.summary(scope, endpoint_id: endpoint.id)
+    )
+  end
+
+  defp open(socket, nil), do: assign(socket, delivery: nil, payload: nil)
+
+  defp open(socket, id) do
+    scope = socket.assigns.kunai_scope
+    endpoint = socket.assigns.endpoint
+
+    case Kunai.get_delivery(scope, id) do
+      %Kunai.Delivery{endpoint_id: endpoint_id} = delivery when endpoint_id == endpoint.id ->
+        event = Kunai.get_event(scope, delivery.event_id)
+        payload = event && Kunai.Payload.build(Kunai.Config.catalog(), event, endpoint)
+        assign(socket, delivery: delivery, payload: payload)
+
+      _missing ->
+        assign(socket, delivery: nil, payload: nil)
+    end
+  end
+
+  # This page's path, with its filter and the delivery opened.
+  defp here(assigns, delivery \\ nil) do
+    query =
+      Enum.reject([status: assigns.status, delivery: delivery], fn {_key, value} ->
+        is_nil(value)
+      end)
+
+    path = "#{assigns.kunai.base}/#{assigns.endpoint.id}"
+    if query == [], do: path, else: path <> "?" <> URI.encode_query(query)
   end
 
   @impl true
-  def handle_info({kind, _detail}, socket) when kind in [:kunai_attempt, :kunai_delivery] do
-    {:noreply, socket |> reload_endpoint() |> load_deliveries()}
-  end
+  def handle_info({kind, _detail}, socket) when kind in [:kunai_attempt, :kunai_delivery],
+    do: {:noreply, refresh(socket)}
 
-  def handle_info(:refresh, socket),
-    do: {:noreply, socket |> reload_endpoint() |> load_deliveries()}
+  def handle_info(:refresh, socket), do: {:noreply, refresh(socket)}
 
-  defp reload_endpoint(socket) do
-    case Kunai.get_endpoint(socket.assigns.kunai_scope, socket.assigns.endpoint.id) do
-      nil -> socket
-      endpoint -> assign(socket, endpoint: endpoint)
-    end
+  defp refresh(socket) do
+    socket =
+      case Kunai.get_endpoint(socket.assigns.kunai_scope, socket.assigns.endpoint.id) do
+        nil -> socket
+        endpoint -> assign(socket, endpoint: endpoint)
+      end
+
+    socket |> load() |> open(socket.assigns.delivery && socket.assigns.delivery.id)
   end
 
   @impl true
@@ -86,35 +130,48 @@ defmodule Kunai.Live.EndpointLive do
     {:noreply,
      socket
      |> assign(secret: secret)
-     |> put_flash(:info, "A new secret signs from now. The old one still signs for a day.")}
+     |> put_flash(:info, t("A new secret signs from now. The old one still signs for a day."))}
   end
 
   def handle_event("enable", _params, socket) do
     {:ok, endpoint} = Kunai.enable_endpoint(socket.assigns.kunai_scope, socket.assigns.endpoint)
-    {:noreply, socket |> assign(endpoint: endpoint) |> put_flash(:info, "Endpoint enabled.")}
+    {:noreply, socket |> assign(endpoint: endpoint) |> put_flash(:info, t("Endpoint enabled."))}
   end
 
   def handle_event("disable", _params, socket) do
     {:ok, endpoint} = Kunai.disable_endpoint(socket.assigns.kunai_scope, socket.assigns.endpoint)
-    {:noreply, socket |> assign(endpoint: endpoint) |> put_flash(:info, "Endpoint disabled.")}
+    {:noreply, socket |> assign(endpoint: endpoint) |> put_flash(:info, t("Endpoint disabled."))}
   end
 
   def handle_event("delete", _params, socket) do
     {:ok, _endpoint} = Kunai.delete_endpoint(socket.assigns.kunai_scope, socket.assigns.endpoint)
-    {:noreply, socket |> put_flash(:info, "Endpoint deleted.") |> push_navigate(to: ~m"/")}
+
+    {:noreply,
+     socket
+     |> put_flash(:info, t("Endpoint deleted."))
+     |> push_navigate(to: socket.assigns.kunai.base)}
   end
 
   def handle_event("test", %{"type" => type}, socket) do
     type = if type in socket.assigns.test_types, do: type, else: "kunai.ping"
 
     case Kunai.send_test(socket.assigns.kunai_scope, socket.assigns.endpoint, type) do
-      {:ok, _delivery} ->
+      {:ok, delivery} ->
         {:noreply,
-         socket |> load_deliveries() |> put_flash(:info, "A test #{type} is on its way.")}
+         socket
+         |> put_flash(:info, t("A test %{type} is on its way.", type: type))
+         |> push_patch(to: here(socket.assigns, delivery.id))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "The test could not be sent.")}
+        {:noreply, put_flash(socket, :error, t("The test could not be sent."))}
     end
+  end
+
+  def handle_event("retry", _params, socket) do
+    {:ok, _delivery} = Kunai.retry_delivery(socket.assigns.kunai_scope, socket.assigns.delivery)
+
+    {:noreply,
+     socket |> refresh() |> put_flash(:info, t("Sent again, with the same webhook-id."))}
   end
 
   def handle_event("replay", _params, socket) do
@@ -122,145 +179,233 @@ defmodule Kunai.Live.EndpointLive do
 
     message =
       case count do
-        0 -> "No delivery failed in the last day."
-        1 -> "One delivery is sent again."
-        n -> "#{n} deliveries are sent again."
+        0 -> t("No delivery failed in the last day.")
+        n -> tn("One delivery is sent again.", "%{count} deliveries are sent again.", n)
       end
 
-    {:noreply, socket |> load_deliveries() |> put_flash(:info, message)}
+    {:noreply, socket |> load() |> put_flash(:info, message)}
   end
+
+  def handle_event("close", _params, socket),
+    do: {:noreply, push_patch(socket, to: here(socket.assigns))}
 
   @impl true
   def render(assigns) do
     ~H"""
-    <.page mount={@mount} flash={@flash} scope={@kunai_scope}>
-      <.header title={@endpoint.description || URI.parse(@endpoint.url).host} back={~m"/"}>
-        <:subtitle><span class="kunai-mono">{@endpoint.url}</span></:subtitle>
+    <.page kunai={@kunai} flash={@flash}>
+      <.header eyebrow={@kunai.eyebrow} title={@page_title} back={@kunai.base}>
+        <:badge><.status status={endpoint_status(@endpoint)} /></:badge>
+        <:subtitle>
+          <span class="kunai-inline-copy">
+            <span class="kunai-mono">{@endpoint.url}</span><.copy value={@endpoint.url} />
+          </span>
+        </:subtitle>
         <:actions>
-          <.button navigate={~m"/#{@endpoint.id}/edit"}>Edit</.button>
-          <.button :if={Kunai.Endpoint.enabled?(@endpoint)} phx-click="disable">Disable</.button>
-          <.button :if={not Kunai.Endpoint.enabled?(@endpoint)} variant="primary" phx-click="enable">Enable</.button>
-          <.button variant="danger" phx-click="delete" data-confirm="Delete this endpoint and its deliveries?">
-            Delete
+          <.button
+            :if={not Kunai.Endpoint.enabled?(@endpoint)}
+            variant="primary"
+            icon="play"
+            phx-click="enable"
+          >
+            {t("Enable")}
           </.button>
+          <.button icon="edit" navigate={"#{@kunai.base}/#{@endpoint.id}/edit"}>{t("Edit")}</.button>
+          <.menu id="kunai-endpoint-menu">
+            <:item :if={Kunai.Endpoint.enabled?(@endpoint)} click="disable" icon="pause">
+              {t("Disable")}
+            </:item>
+            <:item
+              click="replay"
+              icon="refresh"
+              confirm={t("Send again the deliveries that failed in the last day?")}
+            >
+              {t("Send failed again")}
+            </:item>
+            <:item
+              click="roll"
+              icon="key"
+              confirm={t("Roll the secret? The old one still signs for a day, while the endpoint changes to the new one.")}
+            >
+              {t("Roll secret")}
+            </:item>
+            <:item click="delete" icon="trash" danger confirm={t("Delete this endpoint and its deliveries?")}>
+              {t("Delete")}
+            </:item>
+          </.menu>
         </:actions>
       </.header>
 
-      <div :if={notice(@endpoint)} class={"kunai-notice kunai-notice--#{elem(notice(@endpoint), 0)}"} role="status">
-        {elem(notice(@endpoint), 1)}
+      <.endpoint_notice endpoint={@endpoint} />
+
+      <div class="kunai-layout">
+        <div class="kunai-main">
+          <.card title={t("Last 24 hours")}>
+            <div class="kunai-overview">
+              <div class="kunai-overview-numbers">
+                <.metric label={t("Deliveries")} value={Integer.to_string(@summary.total)} />
+                <.metric label={t("Delivered")} value={success_rate(@summary)} tone={if @summary.failed + @summary.retrying > 0, do: "wait"} />
+                <.metric
+                  label={t("Response time")}
+                  value={if @summary.average_ms, do: t("%{ms} ms", ms: @summary.average_ms), else: "—"}
+                />
+              </div>
+              <.bar_chart hours={@summary.hours} />
+            </div>
+          </.card>
+
+          <.card title={t("Deliveries")} flush id="kunai-deliveries">
+            <:actions>
+              <nav class="kunai-segmented" aria-label={t("Filter")}>
+                <.link patch={"#{@kunai.base}/#{@endpoint.id}"} class={["kunai-segment", is_nil(@status) && "is-active"]}>
+                  {t("All")}
+                </.link>
+                <.link
+                  :for={status <- ~w(succeeded failed pending)}
+                  patch={"#{@kunai.base}/#{@endpoint.id}?status=#{status}"}
+                  class={["kunai-segment", @status == status && "is-active"]}
+                >
+                  {status_label(status)}
+                </.link>
+              </nav>
+            </:actions>
+            <.deliveries_table
+              :if={@deliveries != []}
+              deliveries={@deliveries}
+              base={@kunai.base}
+              patch={"#{@kunai.base}/#{@endpoint.id}"}
+              selected={@delivery && @delivery.id}
+            />
+            <.empty_state
+              :if={@deliveries == []}
+              title={if @status, do: t("None here"), else: t("No deliveries yet")}
+              icon="send"
+            >
+              <p>
+                {if @status,
+                  do: t("No delivery has this status."),
+                  else: t("Send a test event, or wait for the next event.")}
+              </p>
+            </.empty_state>
+            <:footer :if={@more?}>{t("The latest 30 are shown.")}</:footer>
+          </.card>
+        </div>
+
+        <div class="kunai-side">
+          <.card title={t("Details")}>
+            <.properties>
+              <:item label={t("Events")}>
+                <span :if={@endpoint.events == ["*"]}>{t("All events")}</span>
+                <span :if={@endpoint.events != ["*"]} class="kunai-chips">
+                  <span :for={event <- @endpoint.events} class="kunai-tag kunai-mono">{event}</span>
+                </span>
+              </:item>
+              <:item :if={@endpoint.scopes != []} label={t("Access")}>
+                <span class="kunai-chips">
+                  <span :for={scope <- @endpoint.scopes} class="kunai-tag kunai-mono">{scope}</span>
+                </span>
+              </:item>
+              <:item label={t("Payload")}>
+                {if @endpoint.payload == "thin", do: t("Thin: the object's id"), else: t("Full: the whole object")}
+              </:item>
+              <:item label={t("Order")}>
+                {if @endpoint.ordered, do: t("One at a time, in order"), else: t("As soon as they can")}
+              </:item>
+              <:item :if={@endpoint.api_version} label={t("Version")}>
+                <span class="kunai-mono">{@endpoint.api_version}</span>
+              </:item>
+              <:item label={t("Endpoint id")}>
+                <span class="kunai-inline-copy">
+                  <span class="kunai-mono">{@endpoint.id}</span><.copy value={@endpoint.id} />
+                </span>
+              </:item>
+              <:item label={t("Created")}><.time at={@endpoint.inserted_at} /></:item>
+            </.properties>
+          </.card>
+
+          <.card title={t("Signing secret")}>
+            <:actions>
+              <.button :if={is_nil(@secret)} size="sm" icon="eye" phx-click="reveal">{t("Reveal")}</.button>
+              <.button :if={@secret} size="sm" variant="ghost" icon="eye-off" phx-click="hide">{t("Hide")}</.button>
+            </:actions>
+            <.secret id="kunai-secret" value={@secret} prefix={if @ed25519?, do: "whpk_", else: "whsec_"} />
+          </.card>
+
+          <.card title={t("Send a test event")}>
+            <form id="kunai-test" class="kunai-inline-form" phx-submit="test">
+              <select name="type" class="kunai-input kunai-select" aria-label={t("Event")}>
+                <option :for={type <- @test_types} value={type}>{type}</option>
+              </select>
+              <.button type="submit" icon="send" phx-disable-with={t("Sending…")}>{t("Send")}</.button>
+            </form>
+          </.card>
+
+          <.card title={t("Verify signatures")}>
+            <.verify_snippet ed25519={@ed25519?} />
+          </.card>
+        </div>
       </div>
 
-      <dl class="kunai-details">
-        <div>
-          <dt>Status</dt>
-          <dd><.status status={endpoint_status(@endpoint)} /></dd>
-        </div>
-        <div>
-          <dt>Events</dt>
-          <dd class="kunai-mono">{if @endpoint.events == ["*"], do: "All events", else: Enum.join(@endpoint.events, ", ")}</dd>
-        </div>
-        <div :if={@endpoint.scopes != []}>
-          <dt>Access</dt>
-          <dd class="kunai-mono">{Enum.join(@endpoint.scopes, ", ")}</dd>
-        </div>
-        <div>
-          <dt>Payload</dt>
-          <dd>{if @endpoint.payload == "thin", do: "The object's id", else: "The whole object"}</dd>
-        </div>
-        <div>
-          <dt>Order</dt>
-          <dd>{if @endpoint.ordered, do: "One at a time, in order", else: "As soon as they can"}</dd>
-        </div>
-        <div :if={@endpoint.api_version}>
-          <dt>Version</dt>
-          <dd class="kunai-mono">{@endpoint.api_version}</dd>
-        </div>
-        <div>
-          <dt>Id</dt>
-          <dd class="kunai-mono">{@endpoint.id}</dd>
-        </div>
-      </dl>
-
-      <.section title="Signing secret">
-        <:actions>
-          <.button :if={is_nil(@secret)} phx-click="reveal">Reveal</.button>
-          <.button :if={@secret} variant="quiet" phx-click="hide">Hide</.button>
-          <.button
-            phx-click="roll"
-            data-confirm="Roll the secret? The old one still signs for a day, while the endpoint changes to the new one."
-          >
-            Roll
-          </.button>
-        </:actions>
-        <.secret :if={@secret} id="kunai-secret" value={@secret} />
-        <p :if={is_nil(@secret)} class="kunai-muted">Hidden.</p>
-      </.section>
-
-      <.section title="Send a test">
-        <form id="kunai-test" class="kunai-inline" phx-submit="test">
-          <select name="type" class="kunai-input" aria-label="Event">
-            <option :for={type <- @test_types} value={type}>{type}</option>
-          </select>
-          <.button type="submit" phx-disable-with="Sending…">Send</.button>
-        </form>
-      </.section>
-
-      <.section title="Deliveries" id="kunai-deliveries">
-        <:actions>
-          <.button variant="quiet" phx-click="replay" data-confirm="Send again the deliveries that failed in the last day?">
-            Send failed again
-          </.button>
-        </:actions>
-        <p :if={@deliveries == []} class="kunai-muted">None yet. Send a test, or wait for an event.</p>
-        <table :if={@deliveries != []} class="kunai-table">
-          <thead>
-            <tr>
-              <th>Event</th>
-              <th>Status</th>
-              <th>Attempts</th>
-              <th>Last answer</th>
-              <th>When</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr :for={delivery <- @deliveries} id={delivery.id}>
-              <td>
-                <.link navigate={~m"/deliveries/#{delivery.id}"} class="kunai-link kunai-mono">{delivery.event_type}</.link>
-              </td>
-              <td><.status status={delivery.status} /></td>
-              <td>{delivery.attempts}</td>
-              <td class="kunai-mono">{answer(delivery)}</td>
-              <td><.time at={delivery.inserted_at} /></td>
-            </tr>
-          </tbody>
-        </table>
-        <p :if={@more?} class="kunai-muted">The latest 25 are shown.</p>
-      </.section>
+      <div :if={@delivery} class="kunai-drawer-backdrop" phx-click="close"></div>
+      <div
+        :if={@delivery}
+        class="kunai-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("Delivery")}
+        phx-window-keydown="close"
+        phx-key="Escape"
+      >
+        <.delivery_detail delivery={@delivery} endpoint={@endpoint} payload={@payload}>
+          <:actions>
+            <.button size="sm" icon="refresh" phx-click="retry" phx-disable-with={t("Sending…")}>
+              {t("Send again")}
+            </.button>
+            <.button size="sm" variant="ghost" icon="x" patch={here(assigns)} aria-label={t("Close")} />
+          </:actions>
+        </.delivery_detail>
+      </div>
     </.page>
     """
   end
 
-  defp notice(%{status: "disabled", disabled_reason: "gone"}),
-    do:
-      {:fail,
-       "Disabled: the endpoint answered 410 Gone. Enable it once it receives events again."}
+  attr(:endpoint, :map, required: true)
 
-  defp notice(%{status: "disabled", disabled_reason: "failing"}),
-    do:
-      {:fail,
-       "Disabled: every delivery failed for days. Enable it once it answers, and send the failed ones again."}
+  defp endpoint_notice(%{endpoint: %{status: "disabled", disabled_reason: "gone"}} = assigns) do
+    ~H"""
+    <.notice kind="danger" title={t("Disabled: the endpoint answered 410 Gone")}>
+      {t("It receives no events. Enable it once it is ready to, and send the failed deliveries again.")}
+      <:actions><.button size="sm" phx-click="enable">{t("Enable")}</.button></:actions>
+    </.notice>
+    """
+  end
 
-  defp notice(%{status: "disabled"}),
-    do: {:muted, "Disabled: it receives no events until it is enabled."}
+  defp endpoint_notice(%{endpoint: %{status: "disabled", disabled_reason: "failing"}} = assigns) do
+    ~H"""
+    <.notice kind="danger" title={t("Disabled after days of failures")}>
+      {t("Every delivery failed for three days. Enable it once it answers, and send the failed ones again.")}
+      <:actions><.button size="sm" phx-click="enable">{t("Enable")}</.button></:actions>
+    </.notice>
+    """
+  end
 
-  defp notice(%{failing_since: %DateTime{} = since}),
-    do:
-      {:wait,
-       "Every delivery has failed since #{Kunai.Components.ago(since)}. It is disabled after three days of failing."}
+  defp endpoint_notice(%{endpoint: %{status: "disabled"}} = assigns) do
+    ~H"""
+    <.notice kind="info" title={t("Disabled")}>
+      {t("It receives no events until it is enabled.")}
+    </.notice>
+    """
+  end
 
-  defp notice(_endpoint), do: nil
+  defp endpoint_notice(%{endpoint: %{failing_since: %DateTime{}}} = assigns) do
+    ~H"""
+    <.notice kind="warning" title={t("Failing since %{when}", when: ago(@endpoint.failing_since))}>
+      {t("Every delivery has failed since then, and each is tried again. After three days of failures the endpoint is disabled.")}
+    </.notice>
+    """
+  end
 
-  defp answer(%{last_status_code: code}) when is_integer(code), do: Integer.to_string(code)
-  defp answer(%{last_error: error}) when is_binary(error), do: error
-  defp answer(_delivery), do: "—"
+  defp endpoint_notice(assigns) do
+    ~H"""
+    """
+  end
 end

@@ -1,12 +1,9 @@
 defmodule Kunai.Live.DeliveryLive do
   @moduledoc false
-  # A delivery: its event as the endpoint got it, each attempt, and a
-  # button to send it again.
+  # A delivery on a page of its own: its event as the endpoint got it, each
+  # attempt, and a button to send it again. Live.
 
-  use Phoenix.LiveView
-  use PhoenixMountable.Path, mountable: Kunai.Router
-
-  import Kunai.Components
+  use Kunai.Live.Page
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -27,7 +24,9 @@ defmodule Kunai.Live.DeliveryLive do
     else
       _missing ->
         {:ok,
-         socket |> put_flash(:error, "That delivery does not exist.") |> push_navigate(to: ~m"/")}
+         socket
+         |> put_flash(:error, t("That delivery does not exist."))
+         |> push_navigate(to: socket.assigns.kunai.base)}
     end
   end
 
@@ -50,75 +49,27 @@ defmodule Kunai.Live.DeliveryLive do
   @impl true
   def handle_event("retry", _params, socket) do
     {:ok, _delivery} = Kunai.retry_delivery(socket.assigns.kunai_scope, socket.assigns.delivery)
-    {:noreply, socket |> reload() |> put_flash(:info, "Sent again, with the same webhook-id.")}
+    {:noreply, socket |> reload() |> put_flash(:info, t("Sent again, with the same webhook-id."))}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <.page mount={@mount} flash={@flash} scope={@kunai_scope}>
-      <.header title={@delivery.event_type} back={~m"/#{@endpoint.id}"} back_label="Endpoint">
-        <:subtitle>To <span class="kunai-mono">{@endpoint.url}</span></:subtitle>
-        <:actions>
-          <.button phx-click="retry" phx-disable-with="Sending…">Send again</.button>
-        </:actions>
-      </.header>
-
-      <dl class="kunai-details">
-        <div>
-          <dt>Status</dt>
-          <dd><.status status={@delivery.status} /></dd>
-        </div>
-        <div>
-          <dt>Attempts</dt>
-          <dd>{@delivery.attempts}</dd>
-        </div>
-        <div :if={@delivery.status == "pending" and @delivery.next_attempt_at}>
-          <dt>Next attempt</dt>
-          <dd><.time at={@delivery.next_attempt_at} /></dd>
-        </div>
-        <div>
-          <dt>webhook-id</dt>
-          <dd class="kunai-mono">{@delivery.id}</dd>
-        </div>
-        <div>
-          <dt>Event</dt>
-          <dd class="kunai-mono">{@delivery.event_id}</dd>
-        </div>
-      </dl>
-
-      <.section title="Attempts" id="kunai-attempts">
-        <p :if={@delivery.attempt_log == []} class="kunai-muted">Not tried yet.</p>
-        <table :if={@delivery.attempt_log != []} class="kunai-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Answer</th>
-              <th>Time</th>
-              <th>Response</th>
-              <th>When</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr :for={attempt <- Enum.reverse(@delivery.attempt_log)} id={attempt.id}>
-              <td>{attempt.number}</td>
-              <td>
-                <.status
-                  status={if attempt.status_code in 200..299, do: "succeeded", else: "failed"}
-                  label={if attempt.status_code, do: Integer.to_string(attempt.status_code), else: attempt.error}
-                />
-              </td>
-              <td>{attempt.duration_ms} ms</td>
-              <td><code :if={attempt.response_body not in [nil, ""]} class="kunai-snippet">{attempt.response_body}</code></td>
-              <td><.time at={attempt.created_at} /></td>
-            </tr>
-          </tbody>
-        </table>
-      </.section>
-
-      <.section :if={@payload} title="Payload">
-        <.code value={@payload} />
-      </.section>
+    <.page kunai={@kunai} flash={@flash} class="kunai-narrow">
+      <nav class="kunai-crumbs" aria-label={t("Breadcrumb")}>
+        <.link navigate={"#{@kunai.base}/#{@endpoint.id}"} class="kunai-crumb">
+          <.icon name="arrow-left" />{@endpoint.description || URI.parse(@endpoint.url).host}
+        </.link>
+      </nav>
+      <.card>
+        <.delivery_detail delivery={@delivery} endpoint={@endpoint} payload={@payload}>
+          <:actions>
+            <.button size="sm" icon="refresh" phx-click="retry" phx-disable-with={t("Sending…")}>
+              {t("Send again")}
+            </.button>
+          </:actions>
+        </.delivery_detail>
+      </.card>
     </.page>
     """
   end

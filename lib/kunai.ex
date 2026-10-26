@@ -70,14 +70,22 @@ defmodule Kunai do
     do: Events.emit(catalog, multi, type, data, opts)
 
   @doc """
-  Emits an event in a transaction of its own: for a change that is not in
-  the database. Gives the event, or raises.
+  Emits an event now. Called inside a transaction of the app's repo (a
+  `Repo.transact/1` function), it is in that transaction: rolled back with
+  it, sent once it commits. Outside one, in a transaction of its own.
+  Gives the event, or raises. The catalog's `emit!/3` macro calls this,
+  after checking the name when the app compiles.
   """
   @spec emit!(String.t(), map(), keyword()) :: Kunai.Event.t()
-  def emit!(type, data, opts \\ []) do
+  def emit!(type, data, opts \\ []), do: emit!(Config.catalog(), type, data, opts)
+
+  @doc false
+  def emit!(catalog, type, data, opts) when is_atom(catalog) do
     opts = Keyword.put(opts, :as, :event)
 
-    case Ecto.Multi.new() |> emit(type, data, opts) |> Config.repo().transaction() do
+    case Ecto.Multi.new()
+         |> then(&emit(catalog, &1, type, data, opts))
+         |> Config.repo().transaction() do
       {:ok, %{event: event}} ->
         event
 
@@ -108,6 +116,15 @@ defmodule Kunai do
   defdelegate replay(scope, endpoint, opts \\ []), to: Deliveries
   defdelegate send_test(scope, endpoint, type \\ "kunai.ping"), to: Deliveries
   defdelegate list_audit_log(scope, opts \\ []), to: Kunai.Audit, as: :list
+
+  @doc """
+  Gives a new job to each pending delivery overdue by more than `grace`
+  seconds (300): one whose job was lost, as when a node stops in the
+  middle of it. Gives how many (`Kunai.Workers.Recover`, every few minutes).
+  Jobs stuck executing are Oban's to rescue (`Oban.Plugins.Lifeline`).
+  """
+  @spec recover(pos_integer()) :: non_neg_integer()
+  def recover(grace \\ 300) when is_integer(grace) and grace > 0, do: Deliveries.recover(grace)
 
   @doc """
   Deletes the events older than `days`, with their deliveries and

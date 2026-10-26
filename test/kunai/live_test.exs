@@ -8,7 +8,7 @@ defmodule Kunai.LiveTest do
 
   test "no endpoints yet, then a list of them", %{conn: conn} do
     {:ok, _view, html} = live(conn, "/webhooks")
-    assert html =~ "No endpoints yet"
+    assert html =~ "Listen for this account&#39;s events"
 
     {endpoint, _secret} = endpoint!(%{description: "Billing", events: ["page.*"]})
     {:ok, view, _html} = live(conn, "/webhooks")
@@ -36,16 +36,17 @@ defmodule Kunai.LiveTest do
     assert html =~ "Endpoint added"
     [endpoint] = Kunai.list_endpoints(scope()).data
     assert endpoint.events == ["page.published"]
-    assert has_element?(view, "#kunai-new-secret[value='#{Kunai.secret(endpoint)}']")
+    assert has_element?(view, "#kunai-new-secret code", Kunai.secret(endpoint))
   end
 
   test "an endpoint's page: secret, test, deliveries live", %{conn: conn} do
     {endpoint, secret} = endpoint!()
     {:ok, view, _html} = live(conn, "/webhooks/#{endpoint.id}")
 
-    refute has_element?(view, "#kunai-secret")
+    assert has_element?(view, "#kunai-secret .kunai-secret-value--hidden")
+    refute render(view) =~ secret
     view |> element("button", "Reveal") |> render_click()
-    assert has_element?(view, "#kunai-secret[value='#{secret}']")
+    assert has_element?(view, "#kunai-secret code", secret)
 
     view |> form("#kunai-test", type: "page.published") |> render_submit()
     assert render(view) =~ "A test page.published is on its way"
@@ -62,7 +63,7 @@ defmodule Kunai.LiveTest do
     {:ok, view, _html} = live(conn, "/webhooks/#{endpoint.id}")
 
     view |> element("button", "Disable") |> render_click()
-    assert render(view) =~ "it receives no events until it is enabled"
+    assert render(view) =~ "It receives no events until it is enabled"
     view |> element("button", "Enable") |> render_click()
     assert Kunai.get_endpoint(scope(), endpoint.id).status == "enabled"
 

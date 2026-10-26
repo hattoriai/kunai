@@ -1,0 +1,40 @@
+/*
+ * Kunai in the app's daisyUI theme.
+ *
+ * Load this file after kunai.css. It gives every --kunai-* colour and
+ * radius the value of the page's daisyUI theme (--color-base-*,
+ * --color-primary, --color-success, --color-warning, --color-error,
+ * --radius-box, --radius-field), so the pages follow the app's themes,
+ * dark ones too, as a generated Phoenix 1.8 app has them. The faces stay
+ * the page's own.
+ */
+
+.kunai,
+.kunai-flashes {
+  --kunai-font: inherit;
+  --kunai-text: var(--color-base-content);
+  --kunai-muted: color-mix(in oklab, var(--color-base-content) 66%, transparent);
+  --kunai-faint: color-mix(in oklab, var(--color-base-content) 46%, transparent);
+  --kunai-raised: var(--color-base-100);
+  --kunai-surface: var(--color-base-200);
+  --kunai-border: var(--color-base-300);
+  --kunai-rule: color-mix(in oklab, var(--color-base-300) 70%, var(--color-base-100));
+  --kunai-hover: color-mix(in oklab, var(--color-base-200) 70%, var(--color-base-100));
+  --kunai-selected: color-mix(in oklab, var(--color-primary) 8%, var(--color-base-100));
+  --kunai-accent: var(--color-primary);
+  --kunai-accent-text: var(--color-primary-content);
+  --kunai-accent-soft: color-mix(in oklab, var(--color-primary) 12%, var(--color-base-100));
+  --kunai-ok: color-mix(in oklab, var(--color-success) 80%, var(--color-base-content));
+  --kunai-ok-soft: color-mix(in oklab, var(--color-success) 14%, var(--color-base-100));
+  --kunai-ok-chart: var(--color-success);
+  --kunai-wait: color-mix(in oklab, var(--color-warning) 75%, var(--color-base-content));
+  --kunai-wait-soft: color-mix(in oklab, var(--color-warning) 14%, var(--color-base-100));
+  --kunai-wait-chart: var(--color-warning);
+  --kunai-fail: color-mix(in oklab, var(--color-error) 85%, var(--color-base-content));
+  --kunai-fail-soft: color-mix(in oklab, var(--color-error) 12%, var(--color-base-100));
+  --kunai-fail-chart: var(--color-error);
+  --kunai-code-background: var(--color-base-200);
+  --kunai-radius: var(--radius-box);
+  --kunai-radius-field: var(--radius-field);
+  --kunai-button-radius: var(--radius-field);
+}

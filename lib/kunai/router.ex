@@ -47,7 +47,6 @@ defmodule Kunai.Router do
     macro: :kunai,
     title: "Webhooks",
     layout: :host,
-    on_mount: [Kunai.Live.Scope],
     schema: Kunai.Migrations
 
   options(
@@ -55,6 +54,10 @@ defmodule Kunai.Router do
       type: :atom,
       default: :current_scope,
       doc: "The assign that holds the scope, set by the app's `on_mount` hooks."
+    ],
+    eyebrow: [
+      type: :string,
+      doc: "A line above the pages' titles, as the app's other pages have (`\"Settings\"`)."
     ],
     app_layout: [
       type: {:tuple, [:atom, :atom]},

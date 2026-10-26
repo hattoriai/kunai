@@ -67,14 +67,30 @@ defmodule Kunai.Sender do
         finish(delivery, "failed", %{last_error: "endpoint_disabled"})
 
       endpoint.ordered and earlier_pending?(delivery) ->
-        {:snooze, 30}
+        wait(delivery, 30)
 
       true ->
         case CircuitBreaker.check(endpoint.id) do
-          {:open, ms} -> {:snooze, max(div(ms, 1000), 1)}
+          {:open, ms} -> wait(delivery, max(div(ms, 1000), 1))
           :closed -> claimed(delivery, endpoint, event)
         end
     end
+  end
+
+  # A delivery that waits says until when, so that one overdue has lost
+  # its job (Kunai.recover/1).
+  defp wait(delivery, seconds) do
+    Delivery
+    |> where(
+      [d],
+      d.id == ^delivery.id and d.status == "pending" and d.attempts == ^delivery.attempts
+    )
+    |> Config.repo().update_all(
+      [set: [next_attempt_at: DateTime.add(DateTime.utc_now(), seconds, :second)]],
+      Config.repo_opts()
+    )
+
+    {:snooze, seconds}
   end
 
   defp get(schema, id), do: Config.repo().get(schema, id, Config.repo_opts())

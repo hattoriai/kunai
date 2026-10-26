@@ -61,6 +61,25 @@ defmodule Kunai.DeliveryTest do
       refute_received {:request, _url, _headers, _body}
     end
 
+    test "emit! in the app's transaction: kept with it, and rolled back with it" do
+      endpoint!()
+
+      {:ok, event} =
+        repo().transact(fn ->
+          {:ok, KunaiTest.Webhooks.emit!("page.published", %{id: "page_1"}, scope: scope())}
+        end)
+
+      {:error, :boom} =
+        repo().transact(fn ->
+          KunaiTest.Webhooks.emit!("page.published", %{id: "page_2"}, scope: scope())
+          {:error, :boom}
+        end)
+
+      assert [%Event{id: id}] = Kunai.list_events(scope()).data
+      assert id == event.id
+      assert %{success: 2} = drain()
+    end
+
     test "fields redacted by the event and the catalog are never kept" do
       endpoint!()
 
@@ -271,6 +290,40 @@ defmodule Kunai.DeliveryTest do
               )
 
       assert bodies == ["page_1", "page_1", "page_2"]
+    end
+  end
+
+  describe "recover" do
+    test "a delivery whose job was lost gets a new one, and goes" do
+      endpoint!()
+      emit!("page.published", %{id: "page_1"})
+      Oban.drain_queue(Kunai.Config.oban(), queue: :kunai, with_recursion: false)
+
+      # Its job lost, as when a node stops; not overdue yet.
+      repo().delete_all(Oban.Job)
+      assert Kunai.recover() == 0
+
+      repo().update_all(Delivery,
+        set: [next_attempt_at: DateTime.add(DateTime.utc_now(), -600, :second)]
+      )
+
+      assert Kunai.recover() == 1
+      assert %{success: 1} = drain()
+      assert [%Delivery{status: "succeeded"}] = Kunai.list_deliveries(scope()).data
+    end
+
+    test "one waiting its turn, or for the breaker, is not taken for lost" do
+      {endpoint, _} = endpoint!(%{ordered: true})
+      Transport.respond(endpoint.url, [500])
+
+      emit!("page.published", %{id: "page_1"})
+      emit!("page.published", %{id: "page_2"})
+      drain()
+
+      [second, _first] = Kunai.list_deliveries(scope()).data
+      assert second.attempts == 0
+      assert DateTime.after?(second.next_attempt_at, DateTime.utc_now())
+      assert Kunai.recover(1) == 0
     end
   end
 
